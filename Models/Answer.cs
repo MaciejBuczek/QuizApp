@@ -19,8 +19,6 @@ namespace QuizApp.Models
         public int IdQuestion { get; set; }
 
         [ForeignKey("IdQuestion")]
-        public virtual Quiz Quiz { get; set; }
-
         public virtual Question Question { get; set; }
     }
 }
