@@ -7,14 +7,6 @@ using System.Threading.Tasks;
 
 namespace QuizApp.Controllers
 {
-    public class XMLInvoiceGeneration
-    {
-        public Int64 XmlOid { get; set; }
-        public string CourierCompany { get; set; }
-        public string CourierService { get; set; }
-        public Int64? StoreId { get; set; }
-    }
-
     public class QuizController : Controller
     {
         public IActionResult Index()
