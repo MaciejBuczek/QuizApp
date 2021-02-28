@@ -1,9 +1,29 @@
 ﻿<div class="row mt-4">
     <div class="col-8">
-        <input type="text" class="form-control mb-4" placeholder="Quiz name">
+        <input type="text" class="form-control mb-4" id="quizName" placeholder="Quiz title">
     </div>
     <div class="col-4">
-        <button class="btn btn-success float-right">Create</button>
+        <button class="btn btn-success float-right" onclick="getJSON()"><i class="fas fa-plus"></i>&nbsp; Save</button>
+    </div>
+</div>
+<div class="row mb-4">
+    <div class="col-2">
+        <div class="form-check pl-4 mt-5 mb-4" onclick="changeCheckBoxes('negativePoints')">
+            <input class="form-check-input" type="checkbox" value="" id="partialPoints">
+            <label class="form-check-label" for="partialPoints">
+                Assign partial points
+            </label>
+        </div>
+        <div class="form-check pl-4" onclick="changeCheckBoxes('partialPoints')">
+            <input class="form-check-input" type="checkbox" value="" id="negativePoints">
+            <label class="form-check-label" for="negativePoints">
+                Assign negative points
+            </label>
+        </div>
+    </div>
+    <div class="col-10" id="description">
+        <label>Description</label>
+        <div class="summernote"></div>
     </div>
 </div>
 <div class="row">
@@ -23,14 +43,14 @@
                     <div class="card-body">
                         <div>
                             <div class="float-left mb-3">
-                                <label for="timeQ1">Time to answer</label>
+                                <label>Time to answer</label>
                                 <input type="number" class="form-control mb-2" id="timeQ1" placeholder="[s]">
-                                <label for="pointsQ1">Points</label>
+                                <label>Points</label>
                                 <input type="number" class="form-control" id="pointsQ1">
                             </div>
-                            <div class="float-left mb-3 ml-4 w-75">
-                                <label for="questionContentQ1">Question content</label>
-                                <div class="summernote" id="questionContentQ1"></div>
+                            <div class="float-left mb-3 ml-4 w-75" id="questionContentQ1">
+                                <label>Question content</label>
+                                <div class="summernote"></div>
                             </div>
 
                             <div class="accordion float-left w-100 mb-4" id="accordionQ1">
@@ -45,9 +65,9 @@
                                         </h1>
                                     </div>
                                     <div id="collapseQ1A1" class="collapse show" aria-labelledby="headingA1" data-parent="#accordionQ1">
-                                        <div class="card-body">
-                                            <label for="answerContentQ1A1">Answer content</label>
-                                            <div class="summernote" id="answerContentQ1A1"></div>
+                                        <div class="card-body" id="answerContentQ1A1">
+                                            <label>Answer content</label>
+                                            <div class="summernote"></div>
                                         </div>
                                     </div>
                                 </div>
@@ -78,6 +98,12 @@
             }
         }
         
+        function changeCheckBoxes(target) {
+            var element = document.getElementById(target);
+            if (element.checked)
+                element.checked = false;
+        }
+
         function addQuestion() {
             removeSummernoteClasses();   
             document.getElementById("quizAccordion").innerHTML += generateQuizQuestion();
@@ -150,6 +176,36 @@
                 targetSetButton.innerHTML = "<i class='fas fa-check'></i>";
                 targetElement.getElementsByTagName("button")[0].classList.remove("text-white");
             }
+        }
+
+        function getJSON() {
+            var quiz = new Object;
+            quiz.Title = document.getElementById("quizName").value;
+            quiz.Description = document.getElementById("description").getElementsByTagName("p")[1].innerHTML;
+            quiz.NegativePoints = document.getElementById("negativePoints").checked;
+            quiz.PartialPoints = document.getElementById("partialPoints").checked;
+            quiz.CreatedAt = new Date();
+            quiz.Questions = [];
+            var i;
+            for (i = 1; i <= cardNumber; i++) {
+                var question = new Object;
+                question.Content = document.getElementById("questionContentQ" + i).getElementsByTagName("p")[1].innerHTML;
+                question.Time = document.getElementById("timeQ" + i).value;
+                question.Points = document.getElementById("pointsQ" + i).value;
+                question.Answers = [];
+                var j;
+                var correctAnswer = 0;
+                for (j = 1; j <= answersNumbers[i - 1]; j++) {
+                    if (document.getElementById("cardQ" + i + "A" + j).classList.contains("selected"))
+                        correctAnswer += Math.pow(2, (j - 1));
+                    var answer = new Object;
+                    answer.Content = document.getElementById("answerContentQ" + i + "A" + j).getElementsByTagName("p")[1].innerHTML;
+                    question.Answers.push(answer);
+                }
+                question.CorrectAnswer = correctAnswer;
+                quiz.Questions.push(question);
+            }
+            return JSON.stringify(quiz);
         }
 
         $(document).ready(function () {
