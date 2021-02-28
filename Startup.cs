@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using QuizApp.Data;
+using QuizApp.Hubs;
 
 namespace QuizApp
 {
@@ -26,6 +27,7 @@ namespace QuizApp
                 ));
             services.AddControllersWithViews();
             services.AddMvc().AddRazorRuntimeCompilation();
+            services.AddSignalR();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -53,6 +55,7 @@ namespace QuizApp
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
+                endpoints.MapHub<QuizHub>("/quizhub");
             });
         }
     }

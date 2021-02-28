@@ -204,11 +204,17 @@
 
         function uploadQuiz() {
             if (validateeQuiz()) {
-                var json = getJSON();
-            }
+                $.ajax({
+                    url: "/Quiz/Create",
+                    type: "POST",
+                    dataType: "json",
+                    async: false,
+                    data: { quiz: getQuiz() }
+                });
+            }  
         }
 
-        function getJSON() {
+        function getQuiz() {
             var quiz = new Object;
             quiz.Title = document.getElementById("quizName").value;
             quiz.Description = document.getElementById("description").getElementsByTagName("p")[1].innerHTML;
@@ -235,7 +241,7 @@
                 question.CorrectAnswer = correctAnswer;
                 quiz.Questions.push(question);
             }
-            return JSON.stringify(quiz);
+            return quiz;
         }
 
         $(document).ready(function () {

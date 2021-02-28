@@ -14,7 +14,7 @@ namespace QuizApp.Models
         public string Content { get; set; }
 
         [Required]
-        public TimeSpan Time { get; set; }
+        public int Time { get; set; }
 
         [Required]
         public double Points { get; set; }

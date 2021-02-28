@@ -12,6 +12,11 @@ namespace QuizApp.Models
         [Required]
         public string Title { get; set; }
 
+        [Required]
+        public bool NegativePoints { get; set; }
+        [Required]
+        public bool PartialPoints { get; set; }
+
         public string Description { get; set; }
 
         [Required]
