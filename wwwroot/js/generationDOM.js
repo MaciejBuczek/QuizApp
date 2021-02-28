@@ -7,8 +7,8 @@ function generateQuizQuestion() {
                     <div class="card-header" id="headingQ`+ questionCounter.toString() +`">
                         <div class="btn btn-danger float-right" onclick="removeQuestion('cardQ` + questionCounter.toString() +`')"><i class="fas fa-trash"></i></div>
                         <h1 class="mb-0">
-                            <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseQ`+ questionCounter.toString() + `" aria-expanded="false" aria-controls="collapseQ` + questionCounter.toString() +`">
-                                Question #`+ questionCounter.toString() +`
+                            <button class="btn btn-link collapsed" onclick="changeCaret(this)" type="button" data-toggle="collapse" data-target="#collapseQ`+ questionCounter.toString() + `" aria-expanded="false" aria-controls="collapseQ` + questionCounter.toString() +`">
+                                Question #`+ questionCounter.toString() +`  &nbsp;<i class="fas fa-caret-down"></i>
                             </button>
                         </h1>
                     </div>
@@ -33,12 +33,12 @@ function generateQuizQuestion() {
                                             <div class="btn btn-danger float-right" onclick="removeAnswer('cardQ`+ questionCounter.toString() +`A1')"><i class="fas fa-trash"></i></div>
                                             <div class="btn btn-success float-right mr-4" onclick="setCorrectAnswer('cardQ`+ questionCounter.toString() +`A1')"><i class="fas fa-check"></i></div>
                                             <h1 class="mb-0">
-                                                <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseQ`+ questionCounter.toString() + `A1" aria-expanded="true" aria-controls="collapseQ` + questionCounter.toString() +`A1">
-                                                    Answer #1
+                                                <button class="btn btn-link" onclick="changeCaret(this)" type="button" data-toggle="collapse" data-target="#collapseQ`+ questionCounter.toString() + `A1" aria-expanded="true" aria-controls="collapseQ` + questionCounter.toString() +`A1">
+                                                    Answer #1  &nbsp;<i class="fas fa-caret-down"></i>
                                                 </button>
                                             </h1>
                                         </div>
-                                        <div id="collapseQ`+ questionCounter.toString() + `A1" class="collapse show" aria-labelledby="headingA1" data-parent="#accordionQ` + questionCounter.toString() +`">
+                                        <div id="collapseQ`+ questionCounter.toString() + `A1" class="collapse" aria-labelledby="headingA1" data-parent="#accordionQ` + questionCounter.toString() +`">
                                             <div class="card-body" id="answerContentQ`+ questionCounter.toString() +`A1">
                                                 <label>Answer content</label>
                                                 <div class="summernote"></div>
@@ -60,8 +60,8 @@ function generateQuizAnswer(questionCounter) {
                         <div class="btn btn-danger float-right" onclick="removeAnswer('cardQ`+ questionCounter.toString() + `A` + answerNumber.toString() +`')"><i class="fas fa-trash"></i></div>
                         <div class="btn btn-success float-right mr-4" onclick="setCorrectAnswer('cardQ`+ questionCounter.toString() + `A` + answerNumber.toString() +`')"><i class="fas fa-check"></i></div>
                         <h1 class="mb-0">
-                            <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseQ`+ questionCounter.toString() + `A` + answerNumber.toString() + `" aria-expanded="true" aria-controls="collapseQ` + questionCounter.toString() + `A` + answerNumber.toString() +`">
-                                Answer #` + answerNumber.toString() +`
+                            <button class="btn btn-link collapsed" onclick="changeCaret(this)" type="button" data-toggle="collapse" data-target="#collapseQ`+ questionCounter.toString() + `A` + answerNumber.toString() + `" aria-expanded="true" aria-controls="collapseQ` + questionCounter.toString() + `A` + answerNumber.toString() +`">
+                                Answer #` + answerNumber.toString() +`  &nbsp;<i class="fas fa-caret-down"></i>
                             </button>
                         </h1>
                     </div>
