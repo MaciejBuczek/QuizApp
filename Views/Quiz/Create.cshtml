@@ -3,7 +3,7 @@
         <input type="text" class="form-control mb-4" id="quizName" placeholder="Quiz title">
     </div>
     <div class="col-4">
-        <button class="btn btn-success float-right" onclick="getJSON()"><i class="fas fa-plus"></i>&nbsp; Save</button>
+        <button class="btn btn-success float-right" onclick="uploadQuiz()"><i class="fas fa-plus"></i>&nbsp; Save</button>
     </div>
 </div>
 <div class="row mb-4">
@@ -120,9 +120,9 @@
         function removeQuestion(target) {
             var number = parseInt(target.charAt(target.length - 1));
             document.getElementById(target).remove();
-            if (number != cardNumber && cardNumber != 1) {
+            if (number != questionCounter && questionCounter != 1) {
                 var i;
-                for (i = 0; i < cardNumber - number; i++) {
+                for (i = 0; i < questionCounter - number; i++) {
                     var nextElement = document.getElementById("cardQ" + (number + 1 + i));                  
                     var oldValue = "Q" + (number + 1 + i);
                     var newValue = "Q" + (number + i);
@@ -133,7 +133,7 @@
                     nextElement.innerHTML = nextElement.innerHTML.replace(("Question #" + (number + 1 + i)), ("Question #" + (number + i)))
                 }
             }
-            cardNumber--;
+            questionCounter--;
             answersNumbers.splice((number - 1), 1);
         }
 
@@ -178,6 +178,12 @@
             }
         }
 
+        function uploadQuiz() {
+            if (validateeQuiz()) {
+                var json = getJSON();
+            }
+        }
+
         function getJSON() {
             var quiz = new Object;
             quiz.Title = document.getElementById("quizName").value;
@@ -187,7 +193,7 @@
             quiz.CreatedAt = new Date();
             quiz.Questions = [];
             var i;
-            for (i = 1; i <= cardNumber; i++) {
+            for (i = 1; i <= questionCounter; i++) {
                 var question = new Object;
                 question.Content = document.getElementById("questionContentQ" + i).getElementsByTagName("p")[1].innerHTML;
                 question.Time = document.getElementById("timeQ" + i).value;
