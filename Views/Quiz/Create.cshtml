@@ -1,7 +1,250 @@
-﻿
-@{
-    ViewData["Title"] = "Create";
+﻿<div class="row mt-4">
+    <div class="col-8">
+        <input type="text" class="form-control mb-4" id="quizName" placeholder="Quiz title">
+    </div>
+    <div class="col-4">
+        <button class="btn btn-success float-right" onclick="uploadQuiz()"><i class="fas fa-plus"></i>&nbsp; Save</button>
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        <div class="accordion" id="quizAccordion">
+            <div class="card">
+                <div class="card-header bg-primary" id="headingProperties">
+                    <h2 class="mb-0">
+                        <button class="btn btn-link text-white" onclick="changeCaret(this)" type="button" data-toggle="collapse" data-target="#collapseProperties" aria-expanded="true" aria-controls="collapseProperties">
+                            Quiz Properties &nbsp;<i class="fas fa-caret-up"></i>
+                        </button>
+                    </h2>
+                </div>
+                <div id="collapseProperties" class="collapse show" aria-labelledby="headingProperties" data-parent="#quizAccordion">
+                    <div class="card-body">
+                        <div class="row mb-4">
+                            <div class="col-2">
+                                <div class="form-check pl-4 mt-5 mb-4" onclick="changeCheckBoxes('negativePoints')">
+                                    <input class="form-check-input" type="checkbox" value="" id="partialPoints">
+                                    <label class="form-check-label" for="partialPoints">
+                                        Assign partial points
+                                    </label>
+                                </div>
+                                <div class="form-check pl-4" onclick="changeCheckBoxes('partialPoints')">
+                                    <input class="form-check-input" type="checkbox" value="" id="negativePoints">
+                                    <label class="form-check-label" for="negativePoints">
+                                        Assign negative points
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-10" id="description">
+                                <label>Description</label>
+                                <div class="summernote"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card" id="cardQ1">
+                <div class="card-header" id="headingQ1">
+                    <div class="btn btn-danger float-right" onclick="removeQuestion('cardQ1')"><i class="fas fa-trash"></i></div>
+                    <h1 class="mb-0">
+                        <button class="btn btn-link" onclick="changeCaret(this)" type="button" data-toggle="collapse" data-target="#collapseQ1" aria-expanded="true" aria-controls="collapseQ1">
+                            Question #1 &nbsp;<i class="fas fa-caret-down"></i>
+                        </button>
+                    </h1>
+                </div>
+
+                <div id="collapseQ1" class="collapse" aria-labelledby="headingQ1" data-parent="#quizAccordion">
+                    <div class="card-body">
+                        <div>
+                            <div class="float-left mb-3">
+                                <label>Time to answer</label>
+                                <input type="number" class="form-control mb-2" id="timeQ1" placeholder="[s]">
+                                <label>Points</label>
+                                <input type="number" class="form-control" id="pointsQ1">
+                            </div>
+                            <div class="float-left mb-3 ml-4 w-75" id="questionContentQ1">
+                                <label>Question content</label>
+                                <div class="summernote"></div>
+                            </div>
+
+                            <div class="accordion float-left w-100 mb-4" id="accordionQ1">
+                                <div class="card" id="cardQ1A1">
+                                    <div class="card-header heading">
+                                        <div class="btn btn-danger float-right" onclick="removeAnswer('cardQ1A1')"><i class="fas fa-trash"></i></div>
+                                        <div class="btn btn-success float-right mr-4" onclick="setCorrectAnswer('cardQ1A1')"><i class="fas fa-check"></i></div>
+                                        <h1 class="mb-0">
+                                            <button class="btn btn-link" onclick="changeCaret(this)" type="button" data-toggle="collapse" data-target="#collapseQ1A1" aria-expanded="true" aria-controls="collapseQ1A1">
+                                                Answer #1 &nbsp;<i class="fas fa-caret-down"></i>
+                                            </button>
+                                        </h1>
+                                    </div>
+                                    <div id="collapseQ1A1" class="collapse" aria-labelledby="headingA1" data-parent="#accordionQ1">
+                                        <div class="card-body" id="answerContentQ1A1">
+                                            <label>Answer content</label>
+                                            <div class="summernote"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <button class="btn btn-primary" onclick="addAnswer('accordionQ1')"><i class="fas fa-plus"></i>&nbsp; Add Answer</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<button class="btn btn-primary mt-4" onclick="addQuestion()"><i class="fas fa-plus"></i>&nbsp; Add question</button>
+
+
+@section Scripts{
+    <script>
+        function startSummernote() {
+            $('.summernote').summernote({
+                height: 60
+            });
+        }
+
+        function removeSummernoteClasses() {
+            var elements = document.getElementsByClassName("summernote");
+            while (elements.length > 0) {
+                elements[0].classList.remove('summernote');
+            }
+        }
+
+        function changeCaret(target) {
+            var iconElement = target.getElementsByTagName("i")[0];
+            if (iconElement.classList.contains("fa-caret-down")) {
+                iconElement.classList.remove("fa-caret-down");
+                iconElement.classList.add("fa-caret-up");
+            } else {
+                iconElement.classList.add("fa-caret-down");
+                iconElement.classList.remove("fa-caret-up");
+            }
+        }
+
+        function changeCheckBoxes(target) {
+            var element = document.getElementById(target);
+            if (element.checked)
+                element.checked = false;
+        }
+
+        function addQuestion() {
+            removeSummernoteClasses();
+            document.getElementById("quizAccordion").innerHTML += generateQuizQuestion();
+            startSummernote();
+        }
+
+        function addAnswer(target) {
+            var number = parseInt(target.charAt(target.length - 1));
+            removeSummernoteClasses();
+            document.getElementById(target).innerHTML += generateQuizAnswer(number);
+            startSummernote();
+        }
+
+        function removeQuestion(target) {
+            var number = parseInt(target.charAt(target.length - 1));
+            document.getElementById(target).remove();
+            if (number != questionCounter && questionCounter != 1) {
+                var i;
+                for (i = 0; i < questionCounter - number; i++) {
+                    var nextElement = document.getElementById("cardQ" + (number + 1 + i));
+                    var oldValue = "Q" + (number + 1 + i);
+                    var newValue = "Q" + (number + i);
+                    while (nextElement.innerHTML.indexOf(oldValue) != -1) {
+                        nextElement.innerHTML = nextElement.innerHTML.replace(oldValue, newValue)
+                    }
+                    nextElement.id = "cardQ" + (number + i);
+                    nextElement.innerHTML = nextElement.innerHTML.replace(("Question #" + (number + 1 + i)), ("Question #" + (number + i)))
+                }
+            }
+            questionCounter--;
+            answersNumbers.splice((number - 1), 1);
+        }
+
+        function removeAnswer(target) {
+            var answerNumber = parseInt(target.charAt(target.length - 1));
+            var questionNumber = parseInt(target.charAt(target.length - 3));
+            var lastAnswerNumber = answersNumbers[questionNumber - 1];
+            document.getElementById(target).remove();
+            var i;
+            for (i = 0; i < lastAnswerNumber - answerNumber; i++) {
+                var nextElement = document.getElementById("cardQ" + questionNumber.toString() + "A" + (answerNumber + 1 + i));
+                var oldValue = "A" + (answerNumber + 1 + i);
+                var newValue = "A" + (answerNumber + i);
+                while (nextElement.innerHTML.indexOf(oldValue) != -1) {
+                    nextElement.innerHTML = nextElement.innerHTML.replace(oldValue, newValue)
+                }
+                nextElement.id = "cardQ" + questionNumber.toString() + "A" + (answerNumber + i);
+                nextElement.innerHTML = nextElement.innerHTML.replace(("Answer #" + (answerNumber + 1 + i)), ("Answer #" + (answerNumber + i)))
+            }
+            answersNumbers[questionNumber - 1]--;
+        }
+
+        function setCorrectAnswer(target) {
+            var targetElement = document.getElementById(target);
+            var targetHeadingElement = targetElement.getElementsByClassName("heading")[0];
+            var targetSetButton = targetHeadingElement.getElementsByTagName("div")[1];
+            if (!targetElement.classList.contains("selected")) {
+                targetElement.classList.add("selected");
+                targetHeadingElement.classList.add("bg-success");
+                targetSetButton.classList.remove("btn-success");
+                targetSetButton.classList.add("btn-warning");
+                targetSetButton.innerHTML = "<i class='fas fa-times'></i>";
+                targetElement.getElementsByTagName("button")[0].classList.add("text-white");
+                targetElement.get
+            } else {
+                targetElement.classList.remove("selected");
+                targetHeadingElement.classList.remove("bg-success");
+                targetSetButton.classList.add("btn-success");
+                targetSetButton.classList.remove("btn-warning");
+                targetSetButton.innerHTML = "<i class='fas fa-check'></i>";
+                targetElement.getElementsByTagName("button")[0].classList.remove("text-white");
+            }
+        }
+
+        function uploadQuiz() {
+            if (validateeQuiz()) {
+                $.ajax({
+                    url: "/Quiz/Create",
+                    type: "POST",
+                    dataType: "json",
+                    async: false,
+                    data: { quiz: getQuiz() }
+                });
+            }  
+        }
+
+        function getQuiz() {
+            var quiz = new Object;
+            quiz.Title = document.getElementById("quizName").value;
+            quiz.Description = document.getElementById("description").getElementsByTagName("p")[1].innerHTML;
+            quiz.NegativePoints = document.getElementById("negativePoints").checked;
+            quiz.PartialPoints = document.getElementById("partialPoints").checked;
+            quiz.Questions = [];
+            var i;
+            for (i = 1; i <= questionCounter; i++) {
+                var question = new Object;
+                question.Content = document.getElementById("questionContentQ" + i).getElementsByTagName("p")[1].innerHTML;
+                question.Time = document.getElementById("timeQ" + i).value;
+                question.Points = document.getElementById("pointsQ" + i).value;
+                question.Answers = [];
+                var j;
+                var correctAnswer = 0;
+                for (j = 1; j <= answersNumbers[i - 1]; j++) {
+                    if (document.getElementById("cardQ" + i + "A" + j).classList.contains("selected"))
+                        correctAnswer += Math.pow(2, (j - 1));
+                    var answer = new Object;
+                    answer.Content = document.getElementById("answerContentQ" + i + "A" + j).getElementsByTagName("p")[1].innerHTML;
+                    question.Answers.push(answer);
+                }
+                question.CorrectAnswer = correctAnswer;
+                quiz.Questions.push(question);
+            }
+            return quiz;
+        }
+
+        $(document).ready(function () {
+            startSummernote();
+        });
+    </script>
 }
-
-<h1>Create</h1>
-
