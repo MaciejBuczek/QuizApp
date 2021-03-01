@@ -220,7 +220,6 @@
             quiz.Description = document.getElementById("description").getElementsByTagName("p")[1].innerHTML;
             quiz.NegativePoints = document.getElementById("negativePoints").checked;
             quiz.PartialPoints = document.getElementById("partialPoints").checked;
-            quiz.CreatedAt = new Date();
             quiz.Questions = [];
             var i;
             for (i = 1; i <= questionCounter; i++) {

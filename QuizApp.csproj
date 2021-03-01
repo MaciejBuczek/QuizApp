@@ -5,6 +5,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Migrations\20210301083839_ChangeQuizQuestion.cs" />
+    <Compile Remove="Migrations\20210301083839_ChangeQuizQuestion.Designer.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="3.1.12" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.12" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.12">
