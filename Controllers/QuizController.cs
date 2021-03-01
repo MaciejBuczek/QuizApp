@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using QuizApp.Data;
 using QuizApp.Models;
 using System;
@@ -11,10 +13,12 @@ namespace QuizApp.Controllers
     public class QuizController : Controller
     {
         private readonly ApplicationDbContext _db;
+        private readonly UserManager<IdentityUser> _userManager;
 
-        public QuizController(ApplicationDbContext db)
+        public QuizController(ApplicationDbContext db, UserManager<IdentityUser> userManager)
         {
             _db = db;
+            _userManager = userManager;
         }
 
         public IActionResult Index()
@@ -22,14 +26,17 @@ namespace QuizApp.Controllers
             return View();
         }
 
+        [Authorize]
         public IActionResult Create()
         {
             return View();
         }
 
         [HttpPost]
+        [Authorize]
         public IActionResult Create(Quiz quiz)
         {
+            quiz.UserId = _userManager.GetUserId(User);
             quiz.CreatedAt = DateTime.Now;
             foreach(var question in quiz.Questions)
             {

@@ -23,6 +23,10 @@ namespace QuizApp.Models
         [Display(Name = "Created at")]
         public DateTime CreatedAt { get; set; }
 
+        [Required]
+        [Display(Name = "CreatedBy")]
+        public string UserId { get; set; }
+
         public virtual ICollection<Question> Questions { get; set; }
     }
 }
