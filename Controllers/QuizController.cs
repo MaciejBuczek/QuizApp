@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using QuizApp.Data;
 using QuizApp.Models;
 using System;
@@ -26,6 +27,12 @@ namespace QuizApp.Controllers
             return View();
         }
 
+        public IActionResult MyQuizzes()
+        {
+            var quizzList = _db.Quizzes.Where(q => q.UserId == _userManager.GetUserId(User)).Include(q => q.Questions).ToList();
+            return View(quizzList);
+        }
+
         [Authorize]
         public IActionResult Create()
         {
@@ -48,7 +55,15 @@ namespace QuizApp.Controllers
             }
             _db.Add(quiz);
             _db.SaveChanges();
-            return View();
+            return RedirectToAction(nameof(MyQuizzes));
+        }
+
+        [HttpPost]
+        [Authorize]
+        public IActionResult Remove(int id)
+        {
+
+            return RedirectToAction(nameof(MyQuizzes));
         }
     }
 }

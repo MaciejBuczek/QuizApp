@@ -1,0 +1,56 @@
+﻿@model List<QuizApp.Models.Quiz>
+
+<div class="row mt-5">
+    <div class="col-10">
+        <h1 class="text-primary">Your quizzes</h1>
+    </div>
+    <div class="col-2">
+        <button class="btn btn-danger float-right" id="removeButton" disabled ><i class="fas fa-trash"></i></button>
+        <button class="btn btn-warning float-right mr-4" id="editButton" disabled><i class="fas fa-edit"></i></button> 
+    </div>
+</div>
+<table class="table table-striped table-hover user-select-none mt-4" style="cursor:pointer">
+    @foreach (var quiz in Model)
+    {
+        <tr>
+            <td onclick="selectQuiz(this)">
+                <input type="hidden"  value=@quiz.Id/>
+                <h2 class="text-primary">@quiz.Title</h2>
+                <div class="float-left w-25">
+                    <h5>Total question:&nbsp; @quiz.Questions.Count</h5>
+                    <h5>Total requried time:&nbsp; @quiz.Questions.Sum(q => q.Time)</h5>
+                    <h5>Total points:&nbsp; @quiz.Questions.Sum(q => q.Points)</h5>
+                    <h5>Created at:&nbsp; @quiz.CreatedAt.ToShortDateString()</h5>
+                </div>
+                <div class="float-left w-75">
+                    @Html.Raw(quiz.Description);
+                </div>
+            </td>
+        </tr>
+    }
+</table>
+
+@section Scripts{
+    <script>
+        var editButton = document.getElementById("editButton");
+        var removeButton = document.getElementById("removeButton");
+        var selectedElement = null;
+
+        function selectQuiz(target) {
+            if (selectedElement != null) {
+                selectedElement.classList.remove("bg-info");
+            }
+            if (target == selectedElement) {
+                editButton.disabled = true;
+                removeButton.disabled = true;
+                selectedElement = null;
+            }
+            else {
+                target.classList.add("bg-info");
+                editButton.disabled = false;
+                removeButton.disabled = false;
+                selectedElement = target;
+            }
+        }
+    </script>
+}
