@@ -19,10 +19,10 @@
                     <input type="hidden"  value=@quiz.Id />
                     <h2 class="text-primary mb-2">@quiz.Title</h2>
                     <div class="float-left w-25">
-                        <h6><span class="font-weight-bold">Total questions:&nbsp; </span>@quiz.Questions.Count</h6>
-                        <h6><span class="font-weight-bold">Total time requried:&nbsp; </span>@quiz.Questions.Sum(q => q.Time) s</h6>
-                        <h6><span class="font-weight-bold">Total points:&nbsp; </span>@quiz.Questions.Sum(q => q.Points)</h6>
-                        <h6><span class="font-weight-bold">Created at:&nbsp; </span>@quiz.CreatedAt.ToShortDateString()</h6>
+                        <h6><i class="far fa-question-circle"></i> &nbsp;<span class="font-weight-bold">Total questions:&nbsp; </span>@quiz.Questions.Count</h6>
+                        <h6><i class="far fa-clock"></i> &nbsp;<span class="font-weight-bold">Total time requried:&nbsp; </span>@quiz.Questions.Sum(q => q.Time) s</h6>
+                        <h6><i class="far fa-star"></i> &nbsp;<span class="font-weight-bold">Total points:&nbsp; </span>@quiz.Questions.Sum(q => q.Points)</h6>
+                        <h6><i class="far fa-calendar-alt"></i> &nbsp;<span class="font-weight-bold">Created at:&nbsp; </span>@quiz.CreatedAt.ToShortDateString()</h6>
                     </div>
                     <div class="float-left w-75">
                         @Html.Raw(quiz.Description.Substring(0, quiz.Description.Length - 1));
