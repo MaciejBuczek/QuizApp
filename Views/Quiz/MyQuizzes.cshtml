@@ -4,7 +4,7 @@
 {
     <div class="row mt-5">
         <div class="col-10">
-            <h1>Your quizzes</h1>
+            <h1>Your Quizzes</h1>
         </div>
         <div class="col-2">
             <button class="btn btn-danger float-right" id="removeButton" onclick="removeQuiz()" disabled ><i class="fas fa-trash"></i></button>
@@ -25,7 +25,7 @@
                         <h6><i class="far fa-calendar-alt"></i> &nbsp;<span class="font-weight-bold">Created at:&nbsp; </span>@quiz.CreatedAt.ToShortDateString()</h6>
                     </div>
                     <div class="float-left w-75">
-                        @Html.Raw(quiz.Description.Substring(0, quiz.Description.Length - 1));
+                        @Html.Raw(quiz.Description)
                     </div>
                 </td>
             </tr>
@@ -87,7 +87,7 @@ else
         }
 
         function editQuiz() {
-            var url = "Quiz/Edit/" + selectedElement.getElementsByTagName("input")[0].value;
+            var url = "Edit/" + selectedElement.getElementsByTagName("input")[0].value;
             window.location.replace(url);
         }
 
