@@ -55,15 +55,27 @@ namespace QuizApp.Controllers
             }
             _db.Add(quiz);
             _db.SaveChanges();
-            return RedirectToAction(nameof(MyQuizzes));
+            return Json(new { redirectUrl = Url.Action("MyQuizzes", "Quiz") });
+        }
+
+        public IActionResult Edit(int id)
+        {
+            var quiz = _db.Quizzes.Find(id);
+            if (quiz == null)
+                return NotFound();
+            return View(quiz);
         }
 
         [HttpPost]
         [Authorize]
         public IActionResult Remove(int id)
         {
-
-            return RedirectToAction(nameof(MyQuizzes));
+            var quiz = _db.Quizzes.Find(id);
+            if (quiz == null)
+                return NotFound();
+            _db.Remove(quiz);
+            _db.SaveChanges();
+            return Json(new { redirectUrl = Url.Action("MyQuizzes", "Quiz") });
         }
     }
 }

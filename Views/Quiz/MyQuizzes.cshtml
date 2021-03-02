@@ -1,37 +1,46 @@
 ﻿@model List<QuizApp.Models.Quiz>
 
-<div class="row mt-5">
-    <div class="col-10">
-        <h1 class="text-primary">Your quizzes</h1>
+@if (Model.Count > 0)
+{
+    <div class="row mt-5">
+        <div class="col-10">
+            <h1>Your quizzes</h1>
+        </div>
+        <div class="col-2">
+            <button class="btn btn-danger float-right" id="removeButton" onclick="removeQuiz()" disabled ><i class="fas fa-trash"></i></button>
+            <button class="btn btn-warning float-right mr-4" id="editButton" onclick="editQuiz()" disabled><i class="fas fa-edit"></i></button> 
+        </div>
     </div>
-    <div class="col-2">
-        <button class="btn btn-danger float-right" id="removeButton" disabled ><i class="fas fa-trash"></i></button>
-        <button class="btn btn-warning float-right mr-4" id="editButton" disabled><i class="fas fa-edit"></i></button> 
-    </div>
-</div>
-<table class="table table-striped table-hover user-select-none mt-4" style="cursor:pointer">
-    @foreach (var quiz in Model)
-    {
-        <tr>
-            <td onclick="selectQuiz(this)">
-                <input type="hidden"  value=@quiz.Id/>
-                <h2 class="text-primary">@quiz.Title</h2>
-                <div class="float-left w-25">
-                    <h5>Total question:&nbsp; @quiz.Questions.Count</h5>
-                    <h5>Total requried time:&nbsp; @quiz.Questions.Sum(q => q.Time)</h5>
-                    <h5>Total points:&nbsp; @quiz.Questions.Sum(q => q.Points)</h5>
-                    <h5>Created at:&nbsp; @quiz.CreatedAt.ToShortDateString()</h5>
-                </div>
-                <div class="float-left w-75">
-                    @Html.Raw(quiz.Description);
-                </div>
-            </td>
-        </tr>
-    }
-</table>
+    <table class="table table-striped table-hover user-select-none mt-4" style="cursor:pointer">
+        @foreach (var quiz in Model)
+        {
+            <tr>
+                <td onclick="selectQuiz(this)">
+                    <input type="hidden"  value=@quiz.Id />
+                    <h2 class="text-primary mb-2">@quiz.Title</h2>
+                    <div class="float-left w-25">
+                        <h6><span class="font-weight-bold">Total questions:&nbsp; </span>@quiz.Questions.Count</h6>
+                        <h6><span class="font-weight-bold">Total time requried:&nbsp; </span>@quiz.Questions.Sum(q => q.Time) s</h6>
+                        <h6><span class="font-weight-bold">Total points:&nbsp; </span>@quiz.Questions.Sum(q => q.Points)</h6>
+                        <h6><span class="font-weight-bold">Created at:&nbsp; </span>@quiz.CreatedAt.ToShortDateString()</h6>
+                    </div>
+                    <div class="float-left w-75">
+                        @Html.Raw(quiz.Description.Substring(0, quiz.Description.Length - 1));
+                    </div>
+                </td>
+            </tr>
+        }
+    </table>
+}
+else
+{
+    <h1>You didin't create any quiz</h1>
+}
+
 
 @section Scripts{
     <script>
+
         var editButton = document.getElementById("editButton");
         var removeButton = document.getElementById("removeButton");
         var selectedElement = null;
@@ -52,5 +61,35 @@
                 selectedElement = target;
             }
         }
+
+        function removeQuiz() {
+            var title = selectedElement.getElementsByTagName("h2")[0].innerText;
+            var quizId = parseInt(selectedElement.getElementsByTagName("input")[0].value);
+            Swal.fire({
+                title: 'Are you sure you want to delete the following quiz?',
+                text: title,
+                showCancelButton: true,
+                confirmButtonText: `Remove`,
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: "/Quiz/Remove",
+                        type: "POST",
+                        dataType: "json",
+                        async: false,
+                        data: { id: quizId },
+                        success: function (result) {
+                            window.location.replace(result.redirectUrl);
+                        }
+                    });
+                } 
+            })
+        }
+
+        function editQuiz() {
+            var url = "Quiz/Edit/" + selectedElement.getElementsByTagName("input")[0].value;
+            window.location.replace(url);
+        }
+
     </script>
 }

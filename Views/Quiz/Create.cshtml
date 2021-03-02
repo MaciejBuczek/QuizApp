@@ -209,7 +209,10 @@
                     type: "POST",
                     dataType: "json",
                     async: false,
-                    data: { quiz: getQuiz() }
+                    data: { quiz: getQuiz() },
+                    success: function (result) {
+                        window.location.replace(result.redirectUrl);
+                    }
                 });
             }  
         }
