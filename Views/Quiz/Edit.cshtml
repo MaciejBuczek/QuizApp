@@ -1,1 +1,167 @@
-﻿
+﻿@model QuizApp.Models.ViewModels.QuizVM
+<input type="hidden" id="quizId" value=@Model.Id />
+<div class="row mt-4">
+    <div class="col-8">
+        <input type="text" class="form-control mb-4 h1" id="quizName" placeholder="Quiz title" value="@Model.Title">
+    </div>
+    <div class="col-4">
+        <button class="btn btn-success float-right" onclick="uploadQuiz()"><i class="fas fa-plus"></i>&nbsp; Save</button>
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        <div class="accordion" id="quizAccordion">
+            <div class="card">
+                <div class="card-header bg-primary" id="headingProperties">
+                    <h2 class="mb-0">
+                        <button class="btn btn-link text-white" onclick="changeCaret(this)" type="button" data-toggle="collapse" data-target="#collapseProperties" aria-expanded="true" aria-controls="collapseProperties">
+                            Quiz Properties &nbsp;<i class="fas fa-caret-up"></i>
+                        </button>
+                    </h2>
+                </div>
+                <div id="collapseProperties" class="collapse show" aria-labelledby="headingProperties" data-parent="#quizAccordion">
+                    <div class="card-body">
+                        <div class="row mb-4">
+                            <div class="col-2">
+                                <div class="form-check pl-4 mt-5 mb-4" onclick="changeCheckBoxes('negativePoints')">
+                                    <input class="form-check-input" type="checkbox" value="" id="negativePoints" @(Model.NegativePoints? "checked" : "")>
+                                    <label class="form-check-label" for="partialPoints">
+                                        Assign partial points
+                                    </label>
+                                </div>
+                                <div class="form-check pl-4" onclick="changeCheckBoxes('partialPoints')">
+                                    <input class="form-check-input" type="checkbox" value="" id="partialPoints" @(Model.PartialPoints? "checked" : "")>
+                                    <label class="form-check-label" for="negativePoints">
+                                        Assign negative points
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-10" id="description">
+                                <label>Description</label>
+                                <div class="summernote">@Html.Raw(Model.Description)</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @{
+                var i = 1;
+                var j = 1;
+            }
+            @foreach (var quesiton in Model.Questions)
+            {
+                <div class="card" id=@("cardQ" + i)>
+                    <div class="card-header" id=@("headingQ" + i)>
+                        <div class="btn btn-danger float-right" onclick="removeQuestion(@("cardQ" + i)"><i class="fas fa-trash"></i></div>
+                        <h1 class="mb-0">
+                            <button class="btn btn-link" onclick="changeCaret(this)" type="button" data-toggle="collapse" data-target=@("#collapseQ" + i) aria-expanded="true" aria-controls=@("collapseQ" + i)>
+                                Question #@i &nbsp;<i class="fas fa-caret-down"></i>
+                            </button>
+                        </h1>
+                    </div>
+
+                    <div id=@("collapseQ" + i) class="collapse" aria-labelledby=@("headingQ" + i) data-parent="#quizAccordion">
+                        <div class="card-body">
+                            <div>
+                                <div class="float-left mb-3">
+                                    <label>Time to answer</label>
+                                    <input type="number" class="form-control mb-2" id=@("timeQ" + i) placeholder="[s]" value=@quesiton.Time>
+                                    <label>Points</label>
+                                    <input type="number" class="form-control" id=@("pointsQ" + i) value=@quesiton.Points>
+                                </div>
+                                <div class="float-left mb-3 ml-4 w-75" id=@("questionContentQ" + i)>
+                                    <label>Question content</label>
+                                    <div class="summernote">@Html.Raw(quesiton.Content)</div>
+                                </div>
+
+                                <div class="accordion float-left w-100 mb-4" id=@("accordionQ" + i)>
+
+                                    @{
+                                        j = 1;
+                                    } 
+
+                                    @foreach (var answer in quesiton.Answers)
+                                    {
+                                        <div class="card @(answer.IsCorrect? "correct" : "")" id=@("cardQ"+i+"A"+j)>
+                                            <div class="card-header heading">
+                                                <div class="btn btn-danger float-right" onclick="removeAnswer(@("cardQ"+i+"A" + j))"><i class="fas fa-trash"></i></div>
+                                                <div class="btn btn-success float-right mr-4" onclick="setCorrectAnswer(@("cardQ"+i+"A" + j))"><i class="fas fa-check"></i></div>
+                                                <h1 class="mb-0">
+                                                    <button class="btn btn-link" onclick="changeCaret(this)" type="button" data-toggle="collapse" data-target=@("#collapseQ"+i+"A"+j) aria-expanded="true" aria-controls=@("collapseQ"+i+"A"+j)>
+                                                        Answer #@j &nbsp;<i class="fas fa-caret-down"></i>
+                                                    </button>
+                                                </h1>
+                                            </div>
+                                            <div id=@("collapseQ"+i+"A"+j) class="collapse" aria-labelledby=@("headingA"+j) data-parent=@("#accordionQ"+i)>
+                                                <div class="card-body" id=@("answerContentQ"+i+"A"+j)>
+                                                    <label>Answer content</label>
+                                                    <div class="summernote">@Html.Raw(answer.Content)</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        j++;
+                                    }
+                                </div>
+                                <button class="btn btn-primary" onclick="addAnswer(@("accordionQ" + i))"><i class="fas fa-plus"></i>&nbsp; Add Answer</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                i++;
+             }
+        </div>
+    </div>
+</div>
+<button class="btn btn-primary mt-4" onclick="addQuestion()"><i class="fas fa-plus"></i>&nbsp; Add question</button>
+
+@section Scripts{
+    <script>
+
+        function startSummernote() {
+            $('.summernote').summernote({
+                height: 60
+            });
+        }
+
+        function removeSummernoteClasses() {
+            var elements = document.getElementsByClassName("summernote");
+            while (elements.length > 0) {
+                elements[0].classList.remove('summernote');
+            }
+        }
+
+        function uploadQuiz() {
+            var quizObject = getQuiz();
+            quizObject.Id = parseInt(document.getElementById("quizId").value);
+            if (validateeQuiz()) {
+                $.ajax({
+                    url: "/Quiz/Edit",
+                    type: "POST",
+                    dataType: "json",
+                    async: false,
+                    data: { quiz: quizObject },
+                    success: function (result) {
+                        window.location.replace(result.redirectUrl);
+                    }
+                });
+            }
+        }
+
+        $(document).ready(function () { 
+            questionCounter = @Model.Questions.Count;
+            answersNumbers = [];
+            var i;
+            for (i = 1; i <= questionCounter; i++) {
+                var element = document.getElementById("accordionQ" + i);
+                answersNumbers.push(element.children.length);
+            }
+            var correctAnswers = document.getElementsByClassName("correct");
+            while (correctAnswers.length > 0) {
+                setCorrectAnswer(correctAnswers[0].id);
+                correctAnswers[0].classList.remove("correct");
+            }
+            startSummernote();
+        });
+    </script>
+}

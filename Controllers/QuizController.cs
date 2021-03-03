@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using QuizApp.Data;
 using QuizApp.Models;
+using QuizApp.Models.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -60,10 +61,51 @@ namespace QuizApp.Controllers
 
         public IActionResult Edit(int id)
         {
-            var quiz = _db.Quizzes.Find(id);
-            if (quiz == null)
+            if (_db.Quizzes.Find(id) == null)
                 return NotFound();
-            return View(quiz);
+            var quizVM = _db.Quizzes.Where(q => q.Id == id).Select(q => new QuizVM
+            {
+                Id = q.Id,
+                Title = q.Title,
+                Description = q.Description,
+                NegativePoints = q.NegativePoints,
+                PartialPoints = q.PartialPoints,
+                Questions = _db.Questions.Where(qu => qu.IdQuiz == q.Id).Select(qu => new QuestionVM
+                {
+                    Content = qu.Content,
+                    Time = qu.Time,
+                    Points = qu.Points,
+                    CorrectAnswer = qu.CorrectAnswer,
+                    Answers = _db.Answers.Where(a => a.IdQuestion == qu.Id).Select(a => new AnswerVM
+                    {
+                        Content = a.Content
+                    }).ToList()
+                }).ToList()
+            }).First();
+            quizVM.Questions.ForEach(q => q.SetAnswers());
+            return View(quizVM);
+        }
+
+        [HttpPost]
+        [Authorize]
+        public IActionResult Edit(Quiz quiz)
+        {
+            quiz.UserId = _userManager.GetUserId(User);
+            quiz.CreatedAt = DateTime.Now;
+            foreach (var question in quiz.Questions)
+            {
+                question.Quiz = quiz;
+                foreach (var answer in question.Answers)
+                {
+                    answer.Question = question;
+                }
+            }
+            _db.Quizzes.Remove(_db.Quizzes.Find(quiz.Id));
+            _db.SaveChanges();
+            quiz.Id = 0;
+            _db.Quizzes.Add(quiz);
+            _db.SaveChanges();
+            return Json(new { redirectUrl = Url.Action("MyQuizzes", "Quiz") });
         }
 
         [HttpPost]
