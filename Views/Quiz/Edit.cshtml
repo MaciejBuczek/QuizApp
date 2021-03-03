@@ -1,5 +1,5 @@
 ﻿@model QuizApp.Models.ViewModels.QuizVM
-<input type="hidden" value=@Model.Id />
+<input type="hidden" id="quizId" value=@Model.Id />
 <div class="row mt-4">
     <div class="col-8">
         <input type="text" class="form-control mb-4 h1" id="quizName" placeholder="Quiz title" value="@Model.Title">
@@ -128,6 +128,23 @@
             var elements = document.getElementsByClassName("summernote");
             while (elements.length > 0) {
                 elements[0].classList.remove('summernote');
+            }
+        }
+
+        function uploadQuiz() {
+            var quizObject = getQuiz();
+            quizObject.Id = parseInt(document.getElementById("quizId").value);
+            if (validateeQuiz()) {
+                $.ajax({
+                    url: "/Quiz/Edit",
+                    type: "POST",
+                    dataType: "json",
+                    async: false,
+                    data: { quiz: quizObject },
+                    success: function (result) {
+                        window.location.replace(result.redirectUrl);
+                    }
+                });
             }
         }
 

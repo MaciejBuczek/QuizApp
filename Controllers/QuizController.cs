@@ -63,7 +63,6 @@ namespace QuizApp.Controllers
         {
             if (_db.Quizzes.Find(id) == null)
                 return NotFound();
-            //var quiz = _db.Quizzes.Where(q => q.Id == id).Include(q => q.Questions).ThenInclude(q => q.Answers).FirstOrDefault();
             var quizVM = _db.Quizzes.Where(q => q.Id == id).Select(q => new QuizVM
             {
                 Id = q.Id,
@@ -85,6 +84,28 @@ namespace QuizApp.Controllers
             }).First();
             quizVM.Questions.ForEach(q => q.SetAnswers());
             return View(quizVM);
+        }
+
+        [HttpPost]
+        [Authorize]
+        public IActionResult Edit(Quiz quiz)
+        {
+            quiz.UserId = _userManager.GetUserId(User);
+            quiz.CreatedAt = DateTime.Now;
+            foreach (var question in quiz.Questions)
+            {
+                question.Quiz = quiz;
+                foreach (var answer in question.Answers)
+                {
+                    answer.Question = question;
+                }
+            }
+            _db.Quizzes.Remove(_db.Quizzes.Find(quiz.Id));
+            _db.SaveChanges();
+            quiz.Id = 0;
+            _db.Quizzes.Add(quiz);
+            _db.SaveChanges();
+            return Json(new { redirectUrl = Url.Action("MyQuizzes", "Quiz") });
         }
 
         [HttpPost]

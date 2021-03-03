@@ -92,14 +92,14 @@ function setCorrectAnswer(target) {
 function getQuiz() {
     var quiz = new Object;
     quiz.Title = document.getElementById("quizName").value;
-    quiz.Description = document.getElementById("description").getElementsByTagName("p")[1].innerHTML;
+    quiz.Description = document.getElementById("description").getElementsByClassName("note-editable")[0].innerHTML;
     quiz.NegativePoints = document.getElementById("negativePoints").checked;
     quiz.PartialPoints = document.getElementById("partialPoints").checked;
     quiz.Questions = [];
     var i;
     for (i = 1; i <= questionCounter; i++) {
         var question = new Object;
-        question.Content = document.getElementById("questionContentQ" + i).getElementsByTagName("p")[1].innerHTML;
+        question.Content = document.getElementById("questionContentQ" + i).getElementsByClassName("note-editable")[0].innerHTML;
         question.Time = document.getElementById("timeQ" + i).value;
         question.Points = document.getElementById("pointsQ" + i).value;
         question.Answers = [];
@@ -109,7 +109,7 @@ function getQuiz() {
             if (document.getElementById("cardQ" + i + "A" + j).classList.contains("selected"))
                 correctAnswer += Math.pow(2, (j - 1));
             var answer = new Object;
-            answer.Content = document.getElementById("answerContentQ" + i + "A" + j).getElementsByTagName("p")[1].innerHTML;
+            answer.Content = document.getElementById("answerContentQ" + i + "A" + j).getElementsByClassName("note-editable")[0].innerHTML;
             question.Answers.push(answer);
         }
         question.CorrectAnswer = correctAnswer;
