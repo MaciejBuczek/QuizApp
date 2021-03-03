@@ -7,8 +7,8 @@
             <h1>Your Quizzes</h1>
         </div>
         <div class="col-2">
-            <button class="btn btn-danger float-right" id="removeButton" onclick="removeQuiz()" disabled ><i class="fas fa-trash"></i></button>
-            <button class="btn btn-warning float-right mr-4" id="editButton" onclick="editQuiz()" disabled><i class="fas fa-edit"></i></button> 
+            <button class="btn btn-danger float-right" id="removeButton" onclick="removeQuiz()" disabled><i class="fas fa-trash"></i></button>
+            <button class="btn btn-warning float-right mr-4" id="editButton" onclick="editQuiz()" disabled><i class="fas fa-edit"></i></button>
         </div>
     </div>
     <table class="table table-striped table-hover user-select-none mt-4" style="cursor:pointer">
@@ -16,7 +16,7 @@
         {
             <tr>
                 <td onclick="selectQuiz(this)">
-                    <input type="hidden"  value=@quiz.Id />
+                    <input type="hidden" value=@quiz.Id />
                     <h2 class="text-primary mb-2">@quiz.Title</h2>
                     <div class="float-left w-25">
                         <h6><i class="far fa-question-circle"></i> &nbsp;<span class="font-weight-bold">Total questions:&nbsp; </span>@quiz.Questions.Count</h6>
@@ -82,7 +82,7 @@ else
                             window.location.replace(result.redirectUrl);
                         }
                     });
-                } 
+                }
             })
         }
 

@@ -33,6 +33,11 @@ namespace QuizApp.Controllers
             var quizzList = _db.Quizzes.Where(q => q.UserId == _userManager.GetUserId(User)).Include(q => q.Questions).ToList();
             return View(quizzList);
         }
+        public IActionResult Search(string search)
+        {
+            var quizList = _db.Quizzes.Where(q => q.Title.Contains(search) || search == null).Include(q => q.Questions).ToList();
+            return View(nameof(Index), quizList);
+        }
 
         [Authorize]
         public IActionResult Create()
