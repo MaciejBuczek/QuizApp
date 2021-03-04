@@ -16,6 +16,7 @@ namespace QuizApp.Controllers
     {
         private readonly ApplicationDbContext _db;
         private readonly UserManager<IdentityUser> _userManager;
+        private int _resultPerPage = 3;
 
         public QuizController(ApplicationDbContext db, UserManager<IdentityUser> userManager)
         {
@@ -33,10 +34,19 @@ namespace QuizApp.Controllers
             var quizzList = _db.Quizzes.Where(q => q.UserId == _userManager.GetUserId(User)).Include(q => q.Questions).ToList();
             return View(quizzList);
         }
-        public IActionResult Search(string search)
+        public IActionResult Search(string search, int? targetPage)
         {
-            var quizList = _db.Quizzes.Where(q => q.Title.Contains(search) || search == null).Include(q => q.Questions).ToList();
-            return View(nameof(Index), quizList);
+            var quizQuery = _db.Quizzes.Where(q => q.Title.Contains(search) || search == null);;
+            var quizDisplayVM = new QuizDisplayVM()
+            {
+                Search = search,
+                CurrentPage = targetPage ?? 1,
+                TotalPages = (quizQuery.Count() + _resultPerPage - 1) / _resultPerPage,
+                Quizzes = quizQuery.Include(q => q.Questions).Include(q => q.CreatedBy)
+                    .Skip(_resultPerPage * (targetPage - 1) ?? 0).Take(_resultPerPage).ToList()
+
+            };
+            return View(nameof(Index), quizDisplayVM);
         }
 
         [Authorize]
