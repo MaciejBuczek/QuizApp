@@ -10,6 +10,7 @@ namespace QuizApp.Models.ViewModels
         public List<Quiz> Quizzes { get; set; }
         public int CurrentPage { get; set; }
         public int TotalPages { get; set; }
-        public string Search { get; set; }
+        public string QuizTitle { get; set; }
+        public string AuthorUsername { get; set; }
     }
 }
