@@ -6,7 +6,7 @@ namespace QuizApp.Data.Interfaces
     {
         public void AddLobby(Lobby lobby);
         public void RemoveLobby(string code);
-        public void GetLobby(string code);
+        public Lobby GetLobby(string code);
         public string GetLobbyCode();
     }
 }

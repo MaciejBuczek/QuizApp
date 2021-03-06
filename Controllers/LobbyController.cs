@@ -31,11 +31,35 @@ namespace QuizApp.Controllers
             return View();
         }
 
+        [HttpPost]
+        public IActionResult CheckCode(string lobbyCode)
+        {
+            if(_lobbyManager.GetLobby(lobbyCode) == null)
+            {
+                return null;
+            }
+            return Json(new { redirectUrl = Url.Action("Join", "Lobby", new { lobbyCode = lobbyCode }) });
+        }
+
+        public IActionResult Join(string lobbyCode)
+        {
+            var lobby = _lobbyManager.GetLobby(lobbyCode);
+            var lobbyVM = new LobbyVM()
+            {
+                Quiz = _db.Quizzes.Where(q => q.Id == lobby.QuizId).Include(q => q.Questions)
+                    .Include(q =>  q.CreatedBy).FirstOrDefault(),
+                LobbyCode = lobbyCode,
+                IsOwner = false
+            };
+            return View(nameof(Index), lobbyVM);
+        }
+
         [Authorize]
         public IActionResult Create(int quizId)
         {
             var lobby = new Lobby()
             {
+                QuizId = quizId,
                 OwnerUsername = _db.Quizzes.Where(q => q.Id == quizId).Include(q => q.CreatedBy).
                     Select(q => q.CreatedBy.UserName).FirstOrDefault(),
                 Private = true,

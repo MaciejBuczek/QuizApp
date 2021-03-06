@@ -3,12 +3,11 @@
 }
 
 <div class=" p-3 mb-4">
-
     <div class="d-flex align-items-center justify-content-center" style="margin-top:150px;">
         <div class="input-group w-50">
-            <input type="text" class="form-control" style="height:60px; font-size:40px" placeholder="Lobby Code">
+            <input type="text" class="form-control" id="lobbyCode" style="height:60px; font-size:40px" placeholder="Lobby Code">
             <div class="input-group-append">
-                <button class="btn btn-primary" style="font-size:25px;" type="button">Join lobby</button>
+                <button class="btn btn-primary" style="font-size:25px;" type="button" onclick="connectToLobby()">Join lobby</button>
             </div>
         </div>
     </div>
@@ -23,3 +22,30 @@
         <a asp-controller="" asp-action="" class="btn btn-secondary" style="font-size:15px">Browse all lobbies</a>
     </div>
 </div>
+
+@section Scripts{ 
+    <script>
+        function connectToLobby() {
+            var code = document.getElementById("lobbyCode").value;
+            if (validateLobbyCode()) {
+                $.ajax({
+                    url: "/Lobby/CheckCode",
+                    type: "POST",
+                    dataType: "json",
+                    async: false,
+                    data: { lobbyCode: code },
+                    success: function (result) {
+                        window.location.replace(result.redirectUrl);
+                    },
+                    error: function () {
+                        Swal.fire(
+                            'Lobby Connection Error',
+                            'No lobby with provided code exists',
+                            'error'
+                        )
+                    }
+                });
+            }
+        }
+    </script>
+}

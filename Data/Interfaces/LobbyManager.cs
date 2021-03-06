@@ -11,21 +11,21 @@ namespace QuizApp.Data.Interfaces
         private const string _chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         private const int _codeLength = 6;
         private readonly Random _random = new Random();
-        private List<Lobby> _lobbies = new List<Lobby>();
+        private readonly List<Lobby> _lobbies = new List<Lobby>();
 
         public void AddLobby(Lobby lobby)
         {
             _lobbies.Add(lobby);
         }
 
-        public void GetLobby(string code)
+        public Lobby GetLobby(string code)
         {
-            throw new NotImplementedException();
+            return _lobbies.Where(l => l.Code == code).FirstOrDefault();
         }
 
         public void RemoveLobby(string code)
         {
-            throw new NotImplementedException();
+            _lobbies.Remove(_lobbies.Where(l => l.Code == code).FirstOrDefault());
         }
 
         public string GetLobbyCode()
