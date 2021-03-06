@@ -1,0 +1,92 @@
+﻿@model QuizApp.Models.ViewModels.LobbyVM
+
+<div class="row mt-5">
+    <div class="col-6">
+        <label style="font-size:20px">Share this code with other users to allow them to join</label>
+        <div class="input-group w-75">
+            <input type="text" class="form-control" style="height:60px; font-size:30px;" value="@Model.LobbyCode" readonly />
+            <div class="input-group-append">
+                <button class="btn btn-primary" type="button" style="font-size:20px;">Copy</button>
+            </div>
+        </div>
+    </div>
+    <div class="col-6">
+        <br />
+        <br />
+        <h1 class="text-primary font-weight-bold">
+            Waiting for host to start the quiz...
+        </h1>
+    </div>
+</div>
+<div class="row mt-5 pt-4 border-top">
+    <div class="col-8 h6">
+        <div class="float-right pr-4">
+            <i class="far fa-star"></i>
+            <i class="far fa-star"></i>
+            <i class="far fa-star"></i>
+            <i class="far fa-star"></i>
+            <i class="far fa-star"></i>
+            &nbsp;(0)
+        </div>
+        <br />
+        <br />
+        <h2 class="text-primary">@Model.Quiz.Title</h2>
+        @if (Model.Quiz.Description == null)
+        {
+            <h4>No description</h4>
+        }
+        else
+        {
+            <h4>@Html.Raw(Model.Quiz.Description)</h4>
+        }
+        <div class="row mt-4">
+            <div class="col-4 h5">
+                <span><i class="far fa-question-circle"></i> &nbsp;<span class="font-weight-bold">Total questions:</span> @Model.Quiz.Questions.Count</span>
+            </div>
+            <div class="col-4 h5">
+                <span><i class="far fa-clock"></i> &nbsp;<span class="font-weight-bold">Total time required:</span> @Model.Quiz.Questions.Sum(q => q.Time) s</span>
+            </div>
+            <div class="col-4 h5">
+                <span><i class="fas fa-medal"></i> &nbsp;<span class="font-weight-bold">Total points:</span> @Model.Quiz.Questions.Sum(q => q.Points)</span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-4 h5">
+                <span><i class="far fa-calendar"></i> &nbsp;<span class="font-weight-bold">Created on:</span> @Model.Quiz.CreatedAt.ToShortDateString()</span>
+            </div>
+            <div class="col-4 h5">
+                <span><i class="fas fa-user"></i> &nbsp;<span class="font-weight-bold">Created by:</span> @Model.Quiz.CreatedBy.UserName</span>
+            </div>
+        </div>
+    </div>
+    <div class="col-4 border-left" id="UserBox">
+        <h1>Connected users:</h1>
+        <div>
+            <h2><i class="fas fa-crown"></i>&nbsp; Test User</h2>
+        </div>
+    </div>
+</div>
+
+@section Scripts{ 
+    <script>
+        "use strict";
+
+        let connection = new signalR.HubConnectionBuilder()
+            .configureLogging(signalR.LogLevel.Trace)
+            .withUrl("/hubs/lobby")
+            .build();
+
+        connection.start().then(startSuccess, startFail);
+
+        function startSuccess() {
+            console.log("connected");
+            notify();
+        }
+        function startFail() {
+            console.log("connection failed");
+        }
+        function notify() {
+            connection.send("notifyWatching");
+        }
+    </script>
+}

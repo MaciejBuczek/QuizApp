@@ -20,7 +20,7 @@
         </form>
     </div>
     <div class="col-4">
-        <button class="btn btn-primary float-right" style="cursor:pointer" id="createLobbyButton" onclick="" disabled>
+        <button class="btn btn-primary float-right" style="cursor:pointer" id="createLobbyButton" onclick="createLobby()" disabled>
             <i class="fas fa-user-friends">
                 Create Lobby
             </i>
@@ -61,7 +61,7 @@
                         <br />
                         <h7><i class="fas fa-medal"></i> &nbsp;<span class="font-weight-bold">Total points:&nbsp; </span>@quiz.Questions.Sum(q => q.Points)</h7>
                         <br />
-                        <h7><i class="far fa-calendar-alt"></i> &nbsp;<span class="font-weight-bold">Created at:&nbsp; </span>@quiz.CreatedAt.ToShortDateString()</h7>
+                        <h7><i class="far fa-calendar"></i> &nbsp;<span class="font-weight-bold">Created at:&nbsp; </span>@quiz.CreatedAt.ToShortDateString()</h7>
                     </div>
                     <div class="float-left w-75 pr-4">
                         @if (quiz.Description == null)
@@ -102,6 +102,11 @@
         var removeButton = document.getElementById("startQuizButton");
         var selectedElement = null;
 
+        function createLobby() {
+            var quizId = selectedElement.getElementsByTagName("input")[0].value;
+            window.location.replace("/Lobby/Create?quizId=" + quizId);
+        }
+
         function selectQuiz(target) {
             if (selectedElement != null) {
                 selectedElement.classList.remove("bg-info");
@@ -118,6 +123,5 @@
                 selectedElement = target;
             }
         }
-
     </script>
 }

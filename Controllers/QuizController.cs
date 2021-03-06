@@ -74,6 +74,7 @@ namespace QuizApp.Controllers
             return Json(new { redirectUrl = Url.Action("MyQuizzes", "Quiz") });
         }
 
+        [Authorize]
         public IActionResult Edit(int id)
         {
             if (_db.Quizzes.Find(id) == null)
