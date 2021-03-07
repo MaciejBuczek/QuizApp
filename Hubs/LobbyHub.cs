@@ -1,8 +1,5 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using QuizApp.Data.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace QuizApp.Hubs
@@ -28,6 +25,11 @@ namespace QuizApp.Hubs
             await Groups.AddToGroupAsync(Context.ConnectionId, lobbyCode);
             await Clients.GroupExcept(lobbyCode, Context.ConnectionId).SendAsync("addUser", Context.User.Identity.Name);
             await Clients.Caller.SendAsync("initializeUsers", _lobbyManager.GetLobby(lobbyCode));
+        }
+
+        public async Task BeginQuiz(string lobbyCode)
+        {
+            await Clients.Group(lobbyCode).SendAsync("redirectToQuiz", ("/Lobby/Quiz?lobbyCode=" + lobbyCode));
         }
     }
 }

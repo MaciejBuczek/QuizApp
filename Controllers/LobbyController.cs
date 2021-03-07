@@ -74,5 +74,10 @@ namespace QuizApp.Controllers
             };
             return View(nameof(Index), lobbyVM);
         }
+
+        public IActionResult Quiz(string lobbyCode)
+        {
+            return View(nameof(Quiz),lobbyCode);
+        }
     }
 }

@@ -16,7 +16,7 @@
         {
             <br />
             <br />
-            <button class="btn btn-primary ml-5" style="font-size:25px;">
+            <button class="btn btn-primary ml-5" style="font-size:25px;" onclick="beginQuiz()">
                 <i class="fas fa-play-circle"></i>&nbsp; Start the quiz
             </button>
         }
@@ -96,8 +96,13 @@
                 userBox.innerHTML += generateUserLabel(lobby.connectedUsers[i]);
             }
         });
+
         connection.on("addUser", (user) => {
             document.getElementById("userBox").innerHTML += generateUserLabel(user);
+        });
+
+        connection.on("redirectToQuiz", (url) => {
+            window.location.replace(url);
         });
 
         connection.start().then(startSuccess, startFail);
@@ -118,6 +123,10 @@
             else {
                 connection.invoke("ConnectToLobby", lobbyId);
             }
+        }
+
+        function beginQuiz() {
+            connection.invoke("BeginQuiz", lobbyId);
         }
 
         function copy() {
