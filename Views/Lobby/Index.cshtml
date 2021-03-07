@@ -4,9 +4,10 @@
     <div class="col-6">
         <label style="font-size:20px">Share this code with other users to allow them to join</label>
         <div class="input-group w-75">
-            <input type="text" class="form-control" style="height:60px; font-size:30px;" value="@Model.LobbyCode" readonly />
+            <input type="text" class="form-control" id="lobbyCode" style="height:60px; font-size:30px;" value="@Model.LobbyCode" readonly />
             <div class="input-group-append">
-                <button class="btn btn-primary" type="button" style="font-size:20px;">Copy</button>
+                <button class="btn btn-primary" id="copyButton" type="button" style="font-size:20px;" onclick="copy()" 
+                       data-toggle="tooltip" data-placement="bottom" title="Copy to Clipboard">Copy</button>
             </div>
         </div>
     </div>
@@ -105,15 +106,34 @@
             console.log("connected");
             connectToLobby();
         }
+
         function startFail() {
             console.log("connection failed");
         }
+
         function connectToLobby() {
             if (isOwner) {
                 connection.invoke("ConnectOwnerToLobby", lobbyId);
             }
             else {
                 connection.invoke("ConnectToLobby", lobbyId);
+            }
+        }
+
+        function copy() {
+            var element = document.getElementById("lobbyCode");
+            var button = document.getElementById("copyButton");
+            element.select();
+            element.setSelectionRange(0, 99999);
+            var success = document.execCommand("copy");
+            if (success) {
+                $(button).tooltip('hide')
+                    .attr('data-original-title', 'Copied!')
+                    .tooltip('show');
+            } else {
+                $(button).tooltip('hide')
+                    .attr('data-original-title', 'Please use ctr + c')
+                    .tooltip('show');
             }
         }
     </script>
