@@ -1,6 +1,8 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Identity;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace QuizApp.Models
 {
@@ -24,8 +26,10 @@ namespace QuizApp.Models
         public DateTime CreatedAt { get; set; }
 
         [Required]
-        [Display(Name = "CreatedBy")]
         public string UserId { get; set; }
+
+        [ForeignKey("UserId")]
+        public IdentityUser CreatedBy { get; set; }
 
         public virtual ICollection<Question> Questions { get; set; }
     }

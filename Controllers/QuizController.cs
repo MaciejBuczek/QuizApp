@@ -6,9 +6,7 @@ using QuizApp.Data;
 using QuizApp.Models;
 using QuizApp.Models.ViewModels;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace QuizApp.Controllers
 {
@@ -16,6 +14,7 @@ namespace QuizApp.Controllers
     {
         private readonly ApplicationDbContext _db;
         private readonly UserManager<IdentityUser> _userManager;
+        private readonly int _resultPerPage = 3;
 
         public QuizController(ApplicationDbContext db, UserManager<IdentityUser> userManager)
         {
@@ -32,6 +31,22 @@ namespace QuizApp.Controllers
         {
             var quizzList = _db.Quizzes.Where(q => q.UserId == _userManager.GetUserId(User)).Include(q => q.Questions).ToList();
             return View(quizzList);
+        }
+        public IActionResult Search(string quizTitle, string authorUsername, int? targetPage)
+        {
+            var quizQuery = _db.Quizzes.Include(q => q.CreatedBy).Where(q => (q.Title.Contains(quizTitle) || quizTitle == null) &&
+            (q.CreatedBy.UserName.Contains(authorUsername) || authorUsername == null));
+            var quizDisplayVM = new QuizDisplayVM()
+            {
+                QuizTitle = quizTitle,
+                AuthorUsername = authorUsername,
+                CurrentPage = targetPage ?? 1,
+                TotalPages = (quizQuery.Count() + _resultPerPage - 1) / _resultPerPage,
+                Quizzes = quizQuery.Include(q => q.Questions).Include(q => q.CreatedBy)
+                    .Skip(_resultPerPage * (targetPage - 1) ?? 0).Take(_resultPerPage).ToList()
+
+            };
+            return View(nameof(Index), quizDisplayVM);
         }
 
         [Authorize]
@@ -59,6 +74,7 @@ namespace QuizApp.Controllers
             return Json(new { redirectUrl = Url.Action("MyQuizzes", "Quiz") });
         }
 
+        [Authorize]
         public IActionResult Edit(int id)
         {
             if (_db.Quizzes.Find(id) == null)

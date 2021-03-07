@@ -53,6 +53,7 @@ function generateQuizQuestion() {
                 </div>`;
     return card;
 }
+
 function generateQuizAnswer(questionCounter) {
     var answerNumber = ++answersNumbers[questionCounter - 1];
     var card = `<div class="card" id="cardQ` + questionCounter + `A` + answerNumber +`">
@@ -73,4 +74,14 @@ function generateQuizAnswer(questionCounter) {
                     </div>
                 </div>`;
     return card;
+}
+
+function generateUserLabel(username) {
+    var label = '<h2>' + username + '</h2>'
+    return label;
+}
+
+function generateHostUserLabel(username) {
+    var label = '<h2><i class="fas fa-crown"></i>&nbsp; ' + username + '</h2>'
+    return label;
 }

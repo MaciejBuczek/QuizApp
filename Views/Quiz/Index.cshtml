@@ -1,8 +1,127 @@
-﻿
-@{
-    ViewData["Title"] = "Index";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+﻿@model QuizApp.Models.ViewModels.QuizDisplayVM
+<div class="row mt-3">
+    <div class="col-12">
+        <h3 class="text-primary">Search Results</h3>
+    </div>
+</div>
+<div class="row">
+    <div class="col-8">
+        <form asp-controller="Quiz" asp-action="Search" method="post">
+            <div class="form-group mb-2 float-left">
+                <label for="quizTitle">Quiz Title</label><br />
+                <input name ="quizTitle" type="text" class="form-control" id="quizTitle" value="@Model.QuizTitle">
+            </div>
+            <div class="form-group mb-2 ml-4 float-left">
+                <label for="authorUsername">Author Username</label>
+                <input name="authorUsername" type="text" class="form-control" id="authorUsername" value="@Model.AuthorUsername">
+            </div>
+            <br />
+            <button class="btn btn-secondary ml-4 mt-2 float-left" type="submit">Search</button>
+        </form>
+    </div>
+    <div class="col-4">
+        <button class="btn btn-primary float-right" style="cursor:pointer" id="createLobbyButton" onclick="createLobby()" disabled>
+            <i class="fas fa-user-friends">
+                Create Lobby
+            </i>
+        </button>
+        <button class="btn btn-primary float-right mr-4" style="cursor:pointer" id="startQuizButton" onclick="" disabled>
+            <i class="fas fa-user">
+                Start Quiz
+            </i>
+        </button>
+    </div>
+</div>
+<table class="table table-striped table-hover user-select-none mt-2" style="cursor:pointer">
+    @foreach (var quiz in Model.Quizzes)
+    {
+        <tr>
+            <td onclick="selectQuiz(this)">
+                <input type="hidden" value=@quiz.Id />
+                <div class="w-100">
+                    <div class="text-primary h4 float-left w-75">@quiz.Title</div>
+                    <div class="float-left w-25 pr-4 text-right">
+                        <i class="far fa-star"></i>
+                        <i class="far fa-star"></i>
+                        <i class="far fa-star"></i>
+                        <i class="far fa-star"></i>
+                        <i class="far fa-star"></i>
+                        &nbsp;(0)
+                    </div>
+                </div>
+                <br />
+                <br />
+                <div class="w-100">
+                    <div class="float-left w-25 mt-2">
+                        <h7><i class="fas fa-user"></i> &nbsp;<span class="font-weight-bold">Author:&nbsp; </span>@quiz.CreatedBy.UserName</h7>
+                        <br />
+                        <h7><i class="far fa-question-circle"></i> &nbsp;<span class="font-weight-bold">Total questions:&nbsp; </span>@quiz.Questions.Count</h7>
+                        <br />
+                        <h7><i class="far fa-clock"></i> &nbsp;<span class="font-weight-bold">Total time requried:&nbsp; </span>@quiz.Questions.Sum(q => q.Time) s</h7>
+                        <br />
+                        <h7><i class="fas fa-medal"></i> &nbsp;<span class="font-weight-bold">Total points:&nbsp; </span>@quiz.Questions.Sum(q => q.Points)</h7>
+                        <br />
+                        <h7><i class="far fa-calendar"></i> &nbsp;<span class="font-weight-bold">Created at:&nbsp; </span>@quiz.CreatedAt.ToShortDateString()</h7>
+                    </div>
+                    <div class="float-left w-75 pr-4">
+                        @if (quiz.Description == null)
+                        {
+                            <p>No description</p>
+                        }
+                        else
+                        {
+                            @Html.Raw(quiz.Description)
+                        }
+                    </div>
+                </div>
+            </td>
+        </tr>
+    }
+</table>
+<div>
+    <ul class="pagination">
+        <li class="page-item @(Model.CurrentPage == 1? "disabled":"")">
+            <a href="@Url.Action("Search", new { quizTitle = Model.QuizTitle, authorUsername = Model.AuthorUsername, targetPage = 1 })" class="page-link">&laquo;</a>
+        </li>
+        @for (int i = 1; i <= Model.TotalPages; i++)
+        {
+            <li class="page-item @(i==Model.CurrentPage?"active":"")">
+                <a  href="@Url.Action("Search", new { quizTitle = Model.QuizTitle, authorUsername = Model.AuthorUsername, targetPage = i})" class="page-link">@i</a>
+            </li>
+        }
+        <li class="page-item @(Model.CurrentPage == Model.TotalPages? "disabled":"")">
+            <a href="@Url.Action("Search", new { quizTitle = Model.QuizTitle, authorUsername = Model.AuthorUsername, targetPage = Model.TotalPages })" class="page-link">&raquo;</a>
+        </li>
+    </ul>
+</div>
+
+@section Scripts{
+    <script>
+
+        var editButton = document.getElementById("createLobbyButton");
+        var removeButton = document.getElementById("startQuizButton");
+        var selectedElement = null;
+
+        function createLobby() {
+            var quizId = selectedElement.getElementsByTagName("input")[0].value;
+            window.location.replace("/Lobby/Create?quizId=" + quizId);
+        }
+
+        function selectQuiz(target) {
+            if (selectedElement != null) {
+                selectedElement.classList.remove("bg-info");
+            }
+            if (target == selectedElement) {
+                editButton.disabled = true;
+                removeButton.disabled = true;
+                selectedElement = null;
+            }
+            else {
+                target.classList.add("bg-info");
+                editButton.disabled = false;
+                removeButton.disabled = false;
+                selectedElement = target;
+            }
+        }
+    </script>
 }
-
-<h1>Index</h1>
-

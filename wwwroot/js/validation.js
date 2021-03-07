@@ -43,6 +43,15 @@
     return true;
 }
 
+function validateLobbyCode() {
+    var elementValue = document.getElementById("lobbyCode").value;
+    if (elementValue == null || elementValue == "") {
+        fireErrorAlert("Lobby Code Error", "Please provide a lobby code");
+        return false;
+    }
+    return true;
+}
+
 function fireErrorAlert(errorTitle, errorContent) {
     Swal.fire(
         errorTitle,
