@@ -33,7 +33,7 @@ Application uses MS SQL Server 2019
 ![Algorithm schema](./Screenshots/create.jpg)
 ### Quiz search result page
 ![Algorithm schema](./Screenshots/search.jpg)
-### Lobby section for host
+### Lobby page for host
 ![Algorithm schema](./Screenshots/lobbyhost.jpg)
-### Lobby section for normal user
+### Lobby page for normal user
 ![Algorithm schema](./Screenshots/lobbyuser.jpg)
