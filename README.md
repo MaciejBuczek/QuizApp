@@ -27,3 +27,13 @@ Application uses MS SQL Server 2019
 * Take a quiz main page (question and answers)
 * Quiz rating system
 ## Application exemplary usage
+### Application home page
+![Algorithm schema](./Screenshots/homePage.jpg)
+### Quiz creation page
+![Algorithm schema](./Screenshots/create.jpg)
+### Quiz search result page
+![Algorithm schema](./Screenshots/search.jpg)
+### Lobby section for host
+![Algorithm schema](./Screenshots/lobbyhost.jpg)
+### Lobby section for normal user
+![Algorithm schema](./Screenshots/lobbyuser.jpg)
