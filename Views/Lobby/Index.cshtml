@@ -71,7 +71,7 @@
         </div>
     </div>
     <div class="col-4 border-left">
-        <h1>Connected users:</h1>
+        <h1>Connected users (<span id="connectedCounter"></span>):</h1>
         <div id="userBox" onclick="test()">
 
         </div>
@@ -82,6 +82,7 @@
     <script>
         var lobbyId = "@Model.LobbyCode";
         var isOwner = @(Model.IsOwner? 1 : 0);
+        var userCounter = 1;
 
         var connection = new signalR.HubConnectionBuilder()
             .configureLogging(signalR.LogLevel.Trace)
@@ -91,14 +92,20 @@
         connection.on("initializeUsers", (lobby) => {
             var userBox = document.getElementById("userBox");
             userBox.innerHTML += generateHostUserLabel(lobby.ownerUsername);
+            document.getElementById("connectedCounter").innerHTML = userCounter;
+            userCounter++;
             var i;
             for (i = 0; i < lobby.connectedUsers.length; i++) {
-                userBox.innerHTML += generateUserLabel(lobby.connectedUsers[i]);
+                userBox.innerHTML += generateUserLabel(userCounter, lobby.connectedUsers[i]);
+                document.getElementById("connectedCounter").innerHTML = userCounter;
+                userCounter++;
             }
         });
 
         connection.on("addUser", (user) => {
-            document.getElementById("userBox").innerHTML += generateUserLabel(user);
+            document.getElementById("connectedCounter").innerHTML = userCounter;
+            document.getElementById("userBox").innerHTML += generateUserLabel(userCounter, user);
+            userCounter++;
         });
 
         connection.on("redirectToQuiz", (url) => {

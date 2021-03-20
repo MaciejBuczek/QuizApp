@@ -61,6 +61,7 @@ namespace QuizApp
             {
                 endpoints.MapRazorPages();
                 endpoints.MapHub<LobbyHub>("hubs/lobby");
+                endpoints.MapHub<QuizHub>("hubs/quiz");
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");

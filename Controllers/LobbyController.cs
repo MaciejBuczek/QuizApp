@@ -6,6 +6,7 @@ using QuizApp.Data;
 using QuizApp.Data.Implementations;
 using QuizApp.Data.Interfaces;
 using QuizApp.Models.ViewModels;
+using QuizApp.Views.Lobby;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -59,6 +60,7 @@ namespace QuizApp.Controllers
         {
             var lobby = new Lobby()
             {
+                LobbyStatus = LobbyStatus.Open,
                 QuizId = quizId,
                 OwnerUsername = _db.Quizzes.Where(q => q.Id == quizId).Include(q => q.CreatedBy).
                     Select(q => q.CreatedBy.UserName).FirstOrDefault(),

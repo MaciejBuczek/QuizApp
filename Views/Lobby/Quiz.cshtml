@@ -1,10 +1,70 @@
 ﻿@model string
 
-<h1>Quiz</h1>
+<div class="row pt-4">
+    <div class="col-9">
+
+    </div>
+    <div class="col-3">
+        <div class="mb-2" id="timer">
+            <svg id="timerBox" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <g id="timerCircleGroup">
+                    <circle id="timerPathBackground" cx="50" cy="50" r="45" />
+                    <path id="timerPathForeground"
+                          stroke-dasharray="283 283"
+                          stroke="green"
+                          d="
+                          M 50, 50
+                          m -45, 0
+                          a 45,45 0 1,0 90,0
+                          a 45,45 0 1,0 -90,0
+                        " />
+                </g>
+            </svg>
+            <span id="timerLabel"></span>
+        </div>
+        <div class="row border-bottom p-2 border-left">
+            <h4 class="font-weight-bold">User Panel</h4>
+            <br />
+            <h4>Question Answered: <span id="currentQustions"></span>/<span id="maxQuestions"></span></h4>
+            <h4>Current Score: <span id="userScore"></span></h4>
+        </div>
+        <div class="row p-2 border-left">
+            <h4 class="font-weight-bold">Scoreboard</h4>
+            <div id="userBox">
+
+            </div>
+        </div>
+    </div>
+</div>
 
 @section Scripts{ 
     <script>
         var lobbyCode = "@Model";
+
+        var connection = new signalR.HubConnectionBuilder()
+            .configureLogging(signalR.LogLevel.Trace)
+            .withUrl("/hubs/quiz")
+            .build();
+
+        connection.on("loadQuestion", () => {
+            alert("now");
+        })
+
+        function startSuccess() {
+            console.log("connected");
+            connectToQuiz();
+        }
+
+        function startFail() {
+            console.log("connection failed");
+        }
+
+        function connectToQuiz() {
+            connection.invoke("ConnectToQuiz", lobbyCode);
+        }
+
+        connection.start().then(startSuccess, startFail);
+        startTimer(5);
     </script>
 }
 

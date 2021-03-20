@@ -76,12 +76,12 @@ function generateQuizAnswer(questionCounter) {
     return card;
 }
 
-function generateUserLabel(username) {
-    var label = '<h2>' + username + '</h2>'
+function generateUserLabel(number, username) {
+    var label = '<h2>' + number + ". "+ username + '</h2>'
     return label;
 }
 
-function generateHostUserLabel(username) {
-    var label = '<h2><i class="fas fa-crown"></i>&nbsp; ' + username + '</h2>'
+function generateHostUserLabel( username) {
+    var label = '<h2> 1. ' + username + ' &nbsp;<i class="fas fa-crown"></i></h2>'
     return label;
 }
