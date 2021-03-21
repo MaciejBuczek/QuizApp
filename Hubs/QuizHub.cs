@@ -26,6 +26,7 @@ namespace QuizApp.Hubs
             lobby.SetUserFlag(_userManager.GetUserId(Context.User), true);
             if (lobby.AreAllUserFlagsActivated())
             {
+                Console.WriteLine("now");
                 //await Clients.Group(lobbyCode).SendAsync("loadQuestion");
             }
         }

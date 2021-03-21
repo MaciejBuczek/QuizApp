@@ -3,13 +3,13 @@
 function startTimer(totalSeconds) {
     const totalTime = totalSeconds;
     let timerInterval = 1000;
-    document.getElementById("timerLabel").innerText = updateTimerLabel(totalSeconds);
+    document.getElementById("timer-label").innerText = updateTimerLabel(totalSeconds);
     let interval = setInterval(() => {
         if (--totalSeconds < 0) {
             clearInterval(interval);
         }
         else {
-            document.getElementById("timerLabel").innerText = updateTimerLabel(totalSeconds);
+            document.getElementById("timer-label").innerText = updateTimerLabel(totalSeconds);
             setDasharray(totalTime, totalSeconds);
         }
     }, timerInterval);
@@ -32,5 +32,5 @@ function getPathFraction(totalTime, timeLeft) {
 
 function setDasharray(totalTime, timeLeft) {
     const value = `${(getPathFraction(totalTime, timeLeft) * fullDashArray).toFixed(0)} ${fullDashArray}`;
-    document.getElementById("timerPathForeground").setAttribute("stroke-dasharray", value);
+    document.getElementById("timer-path-foreground").setAttribute("stroke-dasharray", value);
 }

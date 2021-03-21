@@ -2,14 +2,23 @@
 
 <div class="row pt-4">
     <div class="col-9">
-
+        <div id="question-box" class="text-primary h1 w-100 border-bottom pb-2">
+            test Question
+        </div>
+        <div id="answers-box" class="d-flex flex-row justify-content-start flex-wrap">
+            <div class="card m-2" style="width:250px;">
+                <div class="card-body">
+                    <p class="card-text"></p>
+                </div>
+            </div>
+        </div>
     </div>
     <div class="col-3">
         <div class="mb-2" id="timer">
-            <svg id="timerBox" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                <g id="timerCircleGroup">
-                    <circle id="timerPathBackground" cx="50" cy="50" r="45" />
-                    <path id="timerPathForeground"
+            <svg id="timer-box" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <g id="timer-circle-group">
+                    <circle id="timer-path-background" cx="50" cy="50" r="45" />
+                    <path id="timer-path-foreground"
                           stroke-dasharray="283 283"
                           stroke="green"
                           d="
@@ -20,7 +29,7 @@
                         " />
                 </g>
             </svg>
-            <span id="timerLabel"></span>
+            <span id="timer-label"></span>
         </div>
         <div class="row border-bottom p-2 border-left">
             <h4 class="font-weight-bold">User Panel</h4>

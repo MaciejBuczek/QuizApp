@@ -1,18 +1,18 @@
-﻿#timerBox {
+﻿#timer-box {
     height: 200px;
     width: 200px;
     position: relative;
     transform: scaleX(-1);
 }
-#timerCircleGroup{
+#timer-circle-group{
     fill:none;
     stroke:none;
 }
-#timerPathBackground{
+#timer-path-background{
     stroke-width:7px;
     stroke:gray;
 }
-#timerPathForeground {
+#timer-path-foreground {
     stroke-width: 7px;
     stroke-linecap: round;
     transform: rotate(90deg);
@@ -20,7 +20,7 @@
     transition: 1s linear all;
     stroke: #158cba;
 }
-#timerLabel {
+#timer-label {
     position: absolute;
     width: 200px;
     height: 200px;

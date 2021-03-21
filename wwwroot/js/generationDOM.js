@@ -85,3 +85,12 @@ function generateHostUserLabel( username) {
     var label = '<h2> 1. ' + username + ' &nbsp;<i class="fas fa-crown"></i></h2>'
     return label;
 }
+
+function generateAnswerCard(content) {
+    let card = `<div class="card m-2" style="width:250px;">
+                <div class="card-body">
+                    <p class="card-text">${content}</p>
+                </div>
+            </div>`
+    return card;
+}

@@ -89,14 +89,14 @@
             .withUrl("/hubs/lobby")
             .build();
 
-        connection.on("initializeUsers", (lobby) => {
+        connection.on("initializeUsers", (users) => {
             var userBox = document.getElementById("userBox");
-            userBox.innerHTML += generateHostUserLabel(lobby.ownerUsername);
+            userBox.innerHTML += generateHostUserLabel(users[0]);
             document.getElementById("connectedCounter").innerHTML = userCounter;
             userCounter++;
             var i;
-            for (i = 0; i < lobby.connectedUsers.length; i++) {
-                userBox.innerHTML += generateUserLabel(userCounter, lobby.connectedUsers[i]);
+            for (i = 1; i < users.length; i++) {
+                userBox.innerHTML += generateUserLabel(userCounter, users[i]);
                 document.getElementById("connectedCounter").innerHTML = userCounter;
                 userCounter++;
             }

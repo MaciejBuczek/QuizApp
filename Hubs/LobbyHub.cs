@@ -20,10 +20,11 @@ namespace QuizApp.Hubs
         public async Task ConnectOwnerToLobby(string lobbyCode)
         {
             var lobby = _lobbyManager.GetLobby(lobbyCode);
+            lobby.ConnectedUsers.Add(Context.User.Identity.Name);
             if (lobby.LobbyStatus == LobbyStatus.Open)
             {
                 await Groups.AddToGroupAsync(Context.ConnectionId, lobbyCode);
-                await Clients.Caller.SendAsync("initializeUsers", _lobbyManager.GetLobby(lobbyCode));
+                await Clients.Caller.SendAsync("initializeUsers", lobby.ConnectedUsers);
             }
         }
 
@@ -35,7 +36,7 @@ namespace QuizApp.Hubs
                 lobby.ConnectedUsers.Add(Context.User.Identity.Name);
                 await Groups.AddToGroupAsync(Context.ConnectionId, lobbyCode);
                 await Clients.GroupExcept(lobbyCode, Context.ConnectionId).SendAsync("addUser", Context.User.Identity.Name);
-                await Clients.Caller.SendAsync("initializeUsers", _lobbyManager.GetLobby(lobbyCode));
+                await Clients.Caller.SendAsync("initializeUsers", lobby);
             }
         }
 

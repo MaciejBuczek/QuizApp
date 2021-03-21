@@ -1,4 +1,5 @@
-﻿using QuizApp.Views.Lobby;
+﻿using QuizApp.Models;
+using QuizApp.Views.Lobby;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -7,12 +8,12 @@ namespace QuizApp.Data.Implementations
     public class Lobby
     {
         private Dictionary<string, bool> _connectedUsersFlags = new Dictionary<string, bool>();
+        private int _questionCounter;
 
         public LobbyStatus LobbyStatus { get; set; }
-        public string OwnerUsername { get; set; }
         public string Code { get; set; }
         public bool Private { get; set; }
-        public int QuizId { get; set; }
+        public Quiz Quiz { get; set; }
         public List<string> ConnectedUsers { get; set; } = new List<string>();
 
         public void AddUserFlag(string userId, bool value)
