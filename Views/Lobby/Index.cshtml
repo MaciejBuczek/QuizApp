@@ -82,6 +82,7 @@
     <script>
         var lobbyId = "@Model.LobbyCode";
         var isOwner = @(Model.IsOwner? 1 : 0);
+        var redirectURL = '@Url.Action("Index","Home")';
 
         var connection = new signalR.HubConnectionBuilder()
             .configureLogging(signalR.LogLevel.Trace)
@@ -90,6 +91,7 @@
 
         connection.on("initializeUsers", (lobby) => {
             var userBox = document.getElementById("userBox");
+            userBox.innerHTML = "";
             userBox.innerHTML += generateHostUserLabel(lobby.ownerUsername);
             var i;
             for (i = 0; i < lobby.connectedUsers.length; i++) {
@@ -103,6 +105,17 @@
 
         connection.on("redirectToQuiz", (url) => {
             window.location.replace(url);
+        });
+
+        connection.on("closeLobby", () => {
+            Swal.fire({
+                icon: 'error',
+                title: 'Lobby Error',
+                text: 'The Owner has closed this lobby',
+            }).then(() => {
+                window.location.replace(redirectURL);
+
+            });
         });
 
         connection.start().then(startSuccess, startFail);

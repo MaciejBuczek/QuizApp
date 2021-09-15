@@ -60,8 +60,7 @@ namespace QuizApp.Controllers
             var lobby = new Lobby()
             {
                 QuizId = quizId,
-                OwnerUsername = _db.Quizzes.Where(q => q.Id == quizId).Include(q => q.CreatedBy).
-                    Select(q => q.CreatedBy.UserName).FirstOrDefault(),
+                OwnerUsername = User.Identity.Name,
                 Private = true,
                 Code = _lobbyManager.GetLobbyCode()
             };
