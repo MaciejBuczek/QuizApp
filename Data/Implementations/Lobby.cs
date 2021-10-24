@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using QuizApp.Models;
+using System.Collections.Generic;
 
 namespace QuizApp.Data.Implementations
 {
@@ -7,7 +8,7 @@ namespace QuizApp.Data.Implementations
         public string OwnerUsername { get; set; }
         public string Code { get; set; }
         public bool Private { get; set; }
-        public int QuizId { get; set; }
+        public QuizRunner QuizRunner { get; set; }
         public List<string> ConnectedUsers { get; set; } = new List<string>();
     }
 }

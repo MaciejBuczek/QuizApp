@@ -39,7 +39,7 @@
 
 <div class="row">
     <div class="col-10">
-        <h1 class="text-primary">Quiz Title</h1>
+        <h1 class="text-primary" id="title">Quiz Title</h1>
         <h2>Temp Question</h2>
     </div>
     <div class="col-2">
@@ -59,25 +59,33 @@
                 </g>
             </svg>
             <span id="timer-label" class="timer-label">
-                <!-- Remaining time label -->
             </span>
         </div>
     </div>
 </div>
-<div class="row">
+<div class="row mt-2">
     <div class="col-10">
-        <div>
+        <div class="h4">
             Temp Questions
         </div>
     </div>
     <div class="col-2">
-        <h2>Scoreboard</h2>
+        <h2 >Scoreboard</h2>
+        <div id="scoreboard">
+
+        </div>
     </div>
 </div>
 
 @section Scripts{ 
     <script>
         const lobbyCode = "@Model";
+        const redirectURL = '@Url.Action("Index","Home")';
+        let connection = new signalR.HubConnectionBuilder()
+            .configureLogging(signalR.LogLevel.Trace)
+            .withUrl("/hubs/lobby")
+            .build();
+
         const fullDashArray = 283;
 
         function getFormattedTime(time) {
@@ -117,8 +125,49 @@
             document.getElementById("timer-path-remaining").setAttribute("stroke-dasharray", value);
         }
 
+        function initalizeQuiz(quizInfo) {
+            if (quizInfo == null || quizInfo == "")
+                generateSwalRedirect('error', 'Quiz Error', 'Error ocured while loading quiz data');
+            document.getElementById("title").innerText = quizInfo.QuizTitle;
+            //document.getElementById("")
+        }
+
+        function initializeQuestion(question) {
+
+        }
+
+        function connectToQuiz() {
+            connection.invoke("ConnectToQuiz", lobbyCode);
+        }
+
         startTimer();
 
+        connection.start().then(startSuccess, startFail);
+
+        function startSuccess() {
+            connectToLobby();
+        }
+
+        function startFail() {
+            generateSwalRedirect('error', 'Quiz Error', 'Could not connect to quiz');
+        }
+
+        function generateSwalRedirect(icon, title, text) {
+            Swal.fire({
+                icon: icon,
+                title: title,
+                text: text,
+            }).then(() => {
+                window.location.replace(redirectURL)
+            });
+        }
+
+        function updateScoreboard(scores) {
+            let scoreboard = document.getElementById("scoreboard");
+            for (let i = 0; i < scores.length; i++) {
+
+            }
+        }
     </script>
 }
 
