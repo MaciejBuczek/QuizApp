@@ -1,45 +1,50 @@
 ﻿@model string
 
 <style>
-    .timer{
-        position:relative;
-        height:150px;
-        width:150px;
+    .timer {
+        position: relative;
+        height: 150px;
+        width: 150px;
     }
-    .timer-circle{
-        fill:none;
-        stroke:none;
+
+    .timer-circle {
+        fill: none;
+        stroke: none;
     }
-    .timer-path-elapsed{
-        stroke-width:7px;
-        stroke:grey;
+
+    .timer-path-elapsed {
+        stroke-width: 7px;
+        stroke: grey;
     }
-    .timer-label{
+
+    .timer-label {
         position: absolute;
-        width:150px;
-        height:150px;
-        top:0;
-        display:flex;
-        align-items:center;
-        justify-content:center;
-        font-size:20px;
+        width: 150px;
+        height: 150px;
+        top: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
     }
+
     .timer-path-remaining {
-        stroke-width:7px;
-        stroke-linecap:round;
-        transform:rotate(90deg);
-        transform-origin:center;
-        transition:1s linear all;
-        stroke:#158cba;
+        stroke-width: 7px;
+        stroke-linecap: round;
+        transform: rotate(90deg);
+        transform-origin: center;
+        transition: 1s linear all;
+        stroke: #158cba;
     }
+
     .timer-svg {
-        transform:scaleX(-1);
+        transform: scaleX(-1);
     }
 </style>
 
 <div class="row">
     <div class="col-10">
-        <h1 class="text-primary">Quiz Title</h1>
+        <h1 class="text-primary" id="title">Quiz Title</h1>
         <h2>Temp Question</h2>
     </div>
     <div class="col-2">
@@ -67,58 +72,88 @@
 <div class="row">
     <div class="col-10">
         <div>
-            Temp Questions
+            Temp Answers
         </div>
     </div>
-    <div class="col-2">
-        <h2>Scoreboard</h2>
+    <div class="col-2 mt-3">
+        <h1 class="text-primary font-weight-bold">Scoreboard</h1>
+        <div id="scoreboard">
+
+        </div>
     </div>
 </div>
 
-@section Scripts{ 
+@section Scripts{
+    <script src="~/js/timer.js"></script>
     <script>
         const lobbyCode = "@Model";
-        const fullDashArray = 283;
-
-        function getFormattedTime(time) {
-            let minutes = Math.floor(time / 60);
-            let seconds = time % 60;
-
-            if (seconds < 10)
-                seconds = `0${seconds}`;
-
-            return `${minutes}:${seconds}`;
-        }
-
-        function startTimer() {
-            let totalTime = 10;
-            let timePassed = 0;
-            let timeLeft = totalTime;
-
-            document.getElementById("timer-label").innerText = getFormattedTime(timeLeft);
-
-            timerInterval = setInterval(() => {
-                timePassed++;
-                timeLeft = totalTime - timePassed;
-                document.getElementById("timer-label").innerText = getFormattedTime(timeLeft);
-                setDasharray(timeLeft, totalTime);
-                if (timeLeft == 0)
-                    clearInterval(timerInterval);
-            }, 1000);
-        }
-
-        function getTimePercent(timeLeft, totalTime) {
-            let percentRaw = timeLeft / totalTime;
-            return percentRaw - (1 / totalTime) * (1 - percentRaw);
-        }
-
-        function setDasharray(timeLeft, totalTime) {
-            let value = `${(getTimePercent(timeLeft, totalTime) * fullDashArray).toFixed(0)} ${fullDashArray}`;
-            document.getElementById("timer-path-remaining").setAttribute("stroke-dasharray", value);
-        }
+        const redirectURL = '@Url.Action("Index","Home")';
 
         startTimer();
 
+        let connection = new signalR.HubConnectionBuilder()
+            .configureLogging(signalR.LogLevel.Trace)
+            .withUrl("/hubs/quiz")
+            .build();
+
+        function initializeQuestion(question) {
+        }
+
+        function connectToQuiz() {
+            connection.invoke("ConnectToQuiz", lobbyCode);
+        }
+        function startSuccess() {
+            connectToLobby();
+        }
+        function startFail() {
+            generateSwalRedirect('error', 'Quiz Error', 'Could not connect to quiz');
+        }
+
+        function generateSwalRedirect(icon, title, text) {
+            Swal.fire({
+                icon: icon,
+                title: title,
+                text: text,
+            }).then(() => {
+                window.location.replace(redirectURL)
+            });
+        }
+
+        function updateScoreboard(usersScores) {
+            let scoreboard = document.getElementById("scoreboard");
+            scoreboard.innerHTML = '';
+            for (let i = 0; i < usersScores.length; i++) {
+                scoreboard.innerHTML += generateUserLabel(`${usersScores[i].username} ${usersScores[i].score}`);
+            }
+        }
+
+        function startSuccess() {
+            console.log("connected");
+            connectToQuiz();
+        }
+
+        function startFail() {
+            console.log("connection failed");
+            generateSwalRedirect('error', 'Connection Error', 'Could not load the quiz data');
+        }
+
+        connection.start().then(startSuccess, startFail);
+
+        connection.on("initalizeQuiz", (quizInfo) => {
+            if(quizInfo == null || quizInfo == "")
+                generateSwalRedirect('error', 'Connection Error', 'Error ocured while loading quiz data');
+
+                document.getElementById("title").innerText = quizInfo.quizTitle;
+                updateScoreboard(quizInfo.usersScores);
+        });
+
+        connection.on("updateScoreboard", (usersScores) => {
+            updateScoreboard(usersScores);
+        });
+
+        connection.on("beginQuiz", () => {
+            alert("start")
+        });
+
     </script>
 }
-

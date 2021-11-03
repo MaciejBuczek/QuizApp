@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using QuizApp.Constants.HubEnumerables;
 using QuizApp.Data.Interfaces;
-using QuizApp.Data.Responses;
 using System;
 using System.Threading.Tasks;
 
@@ -18,8 +17,12 @@ namespace QuizApp.Hubs
 
         public override async Task OnDisconnectedAsync(Exception exception)
         {
-            if(Context.Items.TryGetValue(LobbyContextItems.LobbyCode, out var lobbyCode))
+            if(Context.Items.TryGetValue(LobbyContextItems.LobbyCode, out var lobbyCode) &&
+                Context.Items.TryGetValue(LobbyContextItems.Removable, out var removable))
             {
+                if (!(bool)removable)
+                    return;
+
                 var lobby = _quizManager.GetLobby((string)lobbyCode);
                 if (lobby != null)
                 {
@@ -40,6 +43,8 @@ namespace QuizApp.Hubs
         public async Task ConnectOwnerToLobby(string lobbyCode)
         {
             Context.Items.Add(LobbyContextItems.LobbyCode, lobbyCode);
+            Context.Items.Add(LobbyContextItems.Removable, true);
+
             await Groups.AddToGroupAsync(Context.ConnectionId, lobbyCode);
             await Clients.Caller.SendAsync("initializeUsers", _quizManager.GetLobby(lobbyCode));
         }
@@ -47,7 +52,10 @@ namespace QuizApp.Hubs
         public async Task ConnectToLobby(string lobbyCode)
         {
             Context.Items.Add(LobbyContextItems.LobbyCode, lobbyCode);
+            Context.Items.Add(LobbyContextItems.Removable, true);
+
             _quizManager.GetLobby(lobbyCode).ConnectedUsers.Add(Context.User.Identity.Name);
+
             await Groups.AddToGroupAsync(Context.ConnectionId, lobbyCode);
             await Clients.GroupExcept(lobbyCode, Context.ConnectionId).SendAsync("addUser", Context.User.Identity.Name);
             await Clients.Caller.SendAsync("initializeUsers", _quizManager.GetLobby(lobbyCode));
@@ -55,6 +63,11 @@ namespace QuizApp.Hubs
 
         public async Task BeginQuiz(string lobbyCode)
         {
+            var lobby = _quizManager.GetLobby(lobbyCode);
+            lobby.UsersConnectedAtStart = lobby.ConnectedUsers.Count + 1;
+
+            Context.Items[LobbyContextItems.Removable] = false;
+
             await Clients.Group(lobbyCode).SendAsync("redirectToQuiz", ("/Lobby/Quiz?lobbyCode=" + lobbyCode));
         }
     }

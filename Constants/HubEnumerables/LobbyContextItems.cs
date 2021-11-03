@@ -2,6 +2,6 @@
 {
     public enum LobbyContextItems
     {
-        LobbyCode
+        LobbyCode, Removable
     }
 }

@@ -61,7 +61,7 @@ namespace QuizApp.Controllers
                 OwnerUsername = User.Identity.Name,
                 Private = true,
             };
-            var quiz = _db.Quizzes.Where(q => q.Id == quizId).Include(q => q.Questions).Include(q => q.CreatedBy).FirstOrDefault();
+            var quiz = _db.Quizzes.Where(q => q.Id == quizId).Include(q => q.Questions).ThenInclude(q => q.Answers).Include(q => q.CreatedBy).FirstOrDefault();
             var quizRunner = new QuizRunner();
             var code = _quizManager.GetQuizCode();
 
