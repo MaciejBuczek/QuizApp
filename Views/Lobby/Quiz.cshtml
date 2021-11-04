@@ -42,6 +42,8 @@
     }
 </style>
 
+<partial name="_LoaderPartial" />
+
 <div class="row">
     <div class="col-10">
         <h1 class="text-primary" id="title">Quiz Title</h1>
@@ -63,9 +65,7 @@
                             "></path>
                 </g>
             </svg>
-            <span id="timer-label" class="timer-label">
-                <!-- Remaining time label -->
-            </span>
+            <span id="timer-label" class="timer-label"></span>
         </div>
     </div>
 </div>
@@ -85,10 +85,12 @@
 
 @section Scripts{
     <script src="~/js/timer.js"></script>
+    <script src="~/js/utils/loader.js"></script>
     <script>
         const lobbyCode = "@Model";
         const redirectURL = '@Url.Action("Index","Home")';
 
+        showLoader("Connecting...");
         startTimer();
 
         let connection = new signalR.HubConnectionBuilder()
