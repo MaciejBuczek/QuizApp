@@ -46,7 +46,7 @@ namespace QuizApp.Controllers
             var lobby = _quizManager.GetLobby(lobbyCode);
             var lobbyVM = new LobbyVM()
             {
-                Quiz = _quizManager.GetQuiz(lobbyCode),
+                Quiz = _quizManager.GetQuizRunner(lobbyCode).Quiz,
                 LobbyCode = lobbyCode,
                 IsOwner = false
             };
@@ -62,10 +62,10 @@ namespace QuizApp.Controllers
                 Private = true,
             };
             var quiz = _db.Quizzes.Where(q => q.Id == quizId).Include(q => q.Questions).ThenInclude(q => q.Answers).Include(q => q.CreatedBy).FirstOrDefault();
-            var quizRunner = new QuizRunner();
+            var quizRunner = new QuizRunner(quiz);
             var code = _quizManager.GetQuizCode();
 
-            _quizManager.AddQuiz(lobby, quizRunner, quiz, code);
+            _quizManager.AddQuiz(lobby, quizRunner, code);
 
             var lobbyVM = new LobbyVM()
             {

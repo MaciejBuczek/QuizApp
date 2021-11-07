@@ -26,7 +26,7 @@ namespace QuizApp.Hubs
             quizRunner.UserScores.Add( new UserScore { Username = Context.User.Identity.Name, Score = 0 });
             var quizInfo = new
             {
-                QuizTitle = _quizManager.GetQuiz(lobbyCode).Title,
+                QuizTitle = _quizManager.GetQuizRunner(lobbyCode).Quiz.Title,
                 UsersScores = quizRunner.UserScores
             };
             quizInfo.UsersScores.OrderByDescending(us => us.Username);
@@ -36,17 +36,26 @@ namespace QuizApp.Hubs
 
             if(quizLobby.UsersConnectedAtStart == quizRunner.UserScores.Count)
             {
-               BeginQuiz(lobbyCode);
+               await BeginQuiz(lobbyCode);
             }
         }
 
-        private void BeginQuiz(string lobbyCode)
+        public async Task GetQuestion(string lobbyCode)
+        {
+            var quizRuuner = _quizManager.GetQuizRunner(lobbyCode);
+            await Clients.Caller.SendAsync("loadQuestion", quizRuuner.GetQuestion(Context.User.Identity.Name));
+        }
+
+        private async Task BeginQuiz(string lobbyCode)
         {
             var quizRunner = _quizManager.GetQuizRunner(lobbyCode);
-            var quiz = _quizManager.GetQuiz(lobbyCode);
+            var quiz = _quizManager.GetQuizRunner(lobbyCode).Quiz;
 
             quizRunner.PrepareQuizForUsers(quiz);
-        }     
+
+            await Clients.Group(lobbyCode).SendAsync("beginQuiz");
+        } 
+
 
     }
 }

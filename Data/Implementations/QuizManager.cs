@@ -13,17 +13,17 @@ namespace QuizApp.Data.Interfaces
         private const int _codeLength = 6;
         private readonly Random _random;
 
-        private Dictionary<string, (Lobby Lobby, QuizRunner QuizRunner, Quiz Quiz)> _quizDic;
+        private Dictionary<string, (Lobby Lobby, QuizRunner QuizRunner)> _quizDic;
 
         public QuizManager()
         {
-            _quizDic = new Dictionary<string, (Lobby Lobby, QuizRunner QuizRunner, Quiz Quiz)>();
+            _quizDic = new Dictionary<string, (Lobby Lobby, QuizRunner QuizRunner)>();
             _random = new Random();
         }
 
-        public void AddQuiz(Lobby lobby, QuizRunner quizRunner, Quiz quiz, string code)
+        public void AddQuiz(Lobby lobby, QuizRunner quizRunner, string code)
         {
-            _quizDic.Add(code, (lobby, quizRunner, quiz));
+            _quizDic.Add(code, (lobby, quizRunner));
         }
 
         public Lobby GetLobby(string code)
@@ -44,11 +44,6 @@ namespace QuizApp.Data.Interfaces
         public QuizRunner GetQuizRunner(string code)
         {
             return _quizDic[code].QuizRunner;
-        }
-
-        public Quiz GetQuiz(string code)
-        {
-            return _quizDic[code].Quiz;
         }
 
         public void RemoveQuiz(string code)

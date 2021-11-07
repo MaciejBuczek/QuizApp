@@ -8,17 +8,24 @@ namespace QuizApp.Data.Implementations
 {
     public class QuizRunner
     {
-        public int QuestionCounter { get; set; }
+        private int _requestCounter;
+
+        private int _questionCounter { get; set; }
 
         public List<UserScore> UserScores { get; set; }
 
         public Dictionary<string, List<ShuffledAnswers>> PersonalisedAnswers { get; set; }
 
-        public QuizRunner()
+        public Quiz Quiz { get; set; }
+
+        public QuizRunner(Quiz quiz)
         {
-            QuestionCounter = 0;
+            _requestCounter = 0;
+            _questionCounter = 0;
+
             UserScores = new List<UserScore>();
             PersonalisedAnswers = new Dictionary<string, List<ShuffledAnswers>>();
+            Quiz = quiz;
         }
 
         private List<AnswerCheck> ParseAnswers(List<Answer> answers, int correctAnswer)
@@ -84,6 +91,20 @@ namespace QuizApp.Data.Implementations
 
                 PersonalisedAnswers.Add(user, shuffledAnswers);
             }
+        }
+
+        public PersonalisedQuestion GetQuestion(string login)
+        {
+            var personalisedQuestion = new PersonalisedQuestion
+            {
+                Question = Quiz.Questions.ToArray()[_questionCounter].Content,
+                Answers = PersonalisedAnswers[login][_questionCounter].AnswersContents
+            };
+
+            if (++_requestCounter == UserScores.Count)
+                _questionCounter++;
+
+            return personalisedQuestion;
         }
     }
 }
