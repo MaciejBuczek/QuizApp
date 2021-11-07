@@ -24,7 +24,6 @@
         <div class="col-2 mt-3">
             <h1 class="text-primary font-weight-bold">Scoreboard</h1>
             <div id="scoreboard">
-
             </div>
         </div>
     </div>
@@ -41,6 +40,7 @@
         const quizTitle = document.getElementById("quiz-title");
         const quizQuestion = document.getElementById("quiz-question");
         const quizAnswers = document.getElementById("quiz-answers");
+        const scoreboard = document.getElementById("scoreboard");
 
         showLoader("Connecting...");
 
@@ -71,10 +71,9 @@
         }
 
         function updateScoreboard(usersScores) {
-            let scoreboard = document.getElementById("scoreboard");
             scoreboard.innerHTML = '';
             for (let i = 0; i < usersScores.length; i++) {
-                scoreboard.innerHTML += generateUserLabel(`${usersScores[i].username} ${usersScores[i].score}`);
+                scoreboard.innerHTML += generateUserPointsLabel(usersScores[i].username, usersScores[i].score);
             }
         }
 
@@ -112,25 +111,35 @@
 
         connection.on("loadQuestion", (personalisedQuestion) => {
             quizQuestion.innerHTML = personalisedQuestion.question;
+            quizAnswers.style = "";
             for (var i = 0; i < personalisedQuestion.answers.length; i++) {
-                generateAnswer(personalisedQuestion.answers[i], i);
+                quizAnswers.innerHTML += generateAnswer(personalisedQuestion.answers[i], i);
             }
         });
 
         function generateAnswer(content, id) {
-            let answer = `<div class="form-check h2">
+            return `<div class="form-check h2">
                               <input class="form-check-input mb-1 answer" type="checkbox" value=${id} id="checkbox-${id}" style="width:1em; heighT:1em;">
                               <label class="form-check-label ml-4" for="checkbox-${id}">
                                 ${content}
                               </label>
-                          </div>`
+                          </div>`;
+        }
 
-            quizAnswers.innerHTML += answer;
+        function generateUserPointsLabel(username, points) {
+            return `<div class="row">
+                        <div class="col-6" style="font-size:1.5em">
+                            ${username}
+                        </div>
+                        <div class="col-6" style="text-align:right; font-size:1.5em">
+                            ${points}
+                        </div>
+                    </div>`;
         }
 
         function submitAnswers() {
             var answers = document.querySelectorAll(".answer:checked");
-        }
+        }     
 
     </script>
 }
