@@ -123,10 +123,15 @@
             for (var i = 0; i < personalisedQuestion.answers.length; i++) {
                 quizAnswers.innerHTML += generateAnswer(personalisedQuestion.answers[i], i);
             }
-            startTimer(personalisedQuestion.time, submitAnswers);
+            startTimer(personalisedQuestion.time, sendAnswers);
         });
 
         function submitAnswers() {
+            stopTimer();
+            sendAnswers();
+        }
+
+        function sendAnswers() {
             let answersCheckboxes = document.querySelectorAll(".answer:checked");
             let answers = [];
 
@@ -135,8 +140,9 @@
             }
 
             alert(answers);
-        }   
+        }
 
+        //TODO
         function countDownAnswers() {
             startTimer(5);
             answerContent.style.display = "none";

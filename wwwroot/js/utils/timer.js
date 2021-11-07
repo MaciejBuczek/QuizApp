@@ -1,6 +1,8 @@
 ﻿const fullDashArray = 283;
 const timeDelay = 5;
 
+let timerInterval;
+
 function getFormattedTime(time) {
     let minutes = Math.floor(time / 60);
     let seconds = time % 60;
@@ -28,6 +30,15 @@ function startTimer(time, onTimeEndFunc) {
             onTimeEndFunc();
         }
     }, 1000);
+}
+
+function stopTimer() {
+    timeLeft = 0;
+
+    document.getElementById("timer-label").innerText = getFormattedTime(timeLeft);
+    setDasharray(timeLeft, 1);
+
+    clearInterval(timerInterval);
 }
 
 function getTimePercent(timeLeft, totalTime) {
