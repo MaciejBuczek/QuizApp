@@ -95,10 +95,16 @@ namespace QuizApp.Data.Implementations
 
         public PersonalisedQuestion GetQuestion(string login)
         {
+            if (string.IsNullOrEmpty(login))
+                throw new ArgumentException(nameof(login));
+
+            var question = Quiz.Questions.ToArray()[_questionCounter];
+
             var personalisedQuestion = new PersonalisedQuestion
             {
-                Question = Quiz.Questions.ToArray()[_questionCounter].Content,
-                Answers = PersonalisedAnswers[login][_questionCounter].AnswersContents
+                Question = question.Content,
+                Answers = PersonalisedAnswers[login][_questionCounter].AnswersContents,
+                Time = question.Time
             };
 
             if (++_requestCounter == UserScores.Count)

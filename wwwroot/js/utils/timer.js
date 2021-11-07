@@ -11,8 +11,8 @@ function getFormattedTime(time) {
     return `${minutes}:${seconds}`;
 }
 
-function startTimer() {
-    let totalTime = 10;
+function startTimer(time, onTimeEndFunc) {
+    let totalTime = time;
     let timePassed = 0;
     let timeLeft = totalTime;
 
@@ -23,8 +23,10 @@ function startTimer() {
         timeLeft = totalTime - timePassed;
         document.getElementById("timer-label").innerText = getFormattedTime(timeLeft);
         setDasharray(timeLeft, totalTime);
-        if (timeLeft == 0)
+        if (timeLeft == 0) {
             clearInterval(timerInterval);
+            onTimeEndFunc();
+        }
     }, 1000);
 }
 

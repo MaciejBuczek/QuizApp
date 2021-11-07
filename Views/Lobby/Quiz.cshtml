@@ -14,12 +14,17 @@
     </div>
     <div class="row">
         <div class="col-10 border-right">
-            <div id="quiz-answers">
+            <div id="answers-await" class="h1 text-primary justify-content-center" style="display:none;">
+                Read the question carefully...
+            </div>
+            <div id="answers-content">
+                <div id="quiz-answers">
 
-            </div>
-            <div class="btn btn-primary mt-4" onclick="submitAnswers()">
-                Submit
-            </div>
+                </div>
+                <div class="btn btn-primary mt-4" onclick="submitAnswers()">
+                    Submit
+                </div>
+            </div>           
         </div>
         <div class="col-2 mt-3">
             <h1 class="text-primary font-weight-bold">Scoreboard</h1>
@@ -32,6 +37,7 @@
 @section Scripts{
     <script src="~/js/utils/timer.js"></script>
     <script src="~/js/utils/loader.js"></script>
+    <script src="~/js/DOMGeneration/DOMQuiz.js"~></script>
     <script>
 
         const lobbyCode = "@Model";
@@ -41,6 +47,8 @@
         const quizQuestion = document.getElementById("quiz-question");
         const quizAnswers = document.getElementById("quiz-answers");
         const scoreboard = document.getElementById("scoreboard");
+        const answerAwait = document.getElementById("answers-await");
+        const answerContent = document.getElementById("answer-content");
 
         showLoader("Connecting...");
 
@@ -115,31 +123,25 @@
             for (var i = 0; i < personalisedQuestion.answers.length; i++) {
                 quizAnswers.innerHTML += generateAnswer(personalisedQuestion.answers[i], i);
             }
+            startTimer(personalisedQuestion.time, submitAnswers);
         });
 
-        function generateAnswer(content, id) {
-            return `<div class="form-check h2">
-                              <input class="form-check-input mb-1 answer" type="checkbox" value=${id} id="checkbox-${id}" style="width:1em; heighT:1em;">
-                              <label class="form-check-label ml-4" for="checkbox-${id}">
-                                ${content}
-                              </label>
-                          </div>`;
-        }
-
-        function generateUserPointsLabel(username, points) {
-            return `<div class="row">
-                        <div class="col-6" style="font-size:1.5em">
-                            ${username}
-                        </div>
-                        <div class="col-6" style="text-align:right; font-size:1.5em">
-                            ${points}
-                        </div>
-                    </div>`;
-        }
-
         function submitAnswers() {
-            var answers = document.querySelectorAll(".answer:checked");
-        }     
+            let answersCheckboxes = document.querySelectorAll(".answer:checked");
+            let answers = [];
+
+            for (var i = 0; i < answersCheckboxes.length; i++) {
+                answers.push(answersCheckboxes[i].value);
+            }
+
+            alert(answers);
+        }   
+
+        function countDownAnswers() {
+            startTimer(5);
+            answerContent.style.display = "none";
+            answerAwait.style.display = "block";
+        }
 
     </script>
 }
