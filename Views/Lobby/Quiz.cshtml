@@ -14,8 +14,7 @@
     </div>
     <div class="row">
         <div class="col-10 border-right">
-            <div id="answers-await" class="h1 text-primary justify-content-center" style="display:none;">
-                Read the question carefully...
+            <div id="answers-await" style="display:none;">
             </div>
             <div id="answers-content">
                 <div id="quiz-answers">
@@ -48,7 +47,7 @@
         const quizAnswers = document.getElementById("quiz-answers");
         const scoreboard = document.getElementById("scoreboard");
         const answerAwait = document.getElementById("answers-await");
-        const answerContent = document.getElementById("answer-content");
+        const answerContent = document.getElementById("answers-content");
 
         showLoader("Connecting...");
 
@@ -112,6 +111,7 @@
         connection.on("beginQuiz", () => {
 
             hideLoader();
+            moveLoader(answerAwait);
             quizContent.style.display = "block";
             connection.invoke("GetQuestion", lobbyCode);
 
@@ -138,15 +138,11 @@
             for (var i = 0; i < answersCheckboxes.length; i++) {
                 answers.push(answersCheckboxes[i].value);
             }
-
             alert(answers);
-        }
 
-        //TODO
-        function countDownAnswers() {
-            startTimer(5);
             answerContent.style.display = "none";
             answerAwait.style.display = "block";
+            showLoader("Waiting for other uses to answer...");
         }
 
     </script>
