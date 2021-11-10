@@ -62,10 +62,25 @@ namespace QuizApp.Hubs
             }
         }
 
-        public async Task GetQuestion(string lobbyCode)
+        public async Task GetQuestion()
         {
-            var quizRuuner = _quizManager.GetQuizRunner(lobbyCode);
-            await Clients.Caller.SendAsync("loadQuestion", quizRuuner.GetQuestion(Context.User.Identity.Name));
+            if (Context.Items.TryGetValue(QuizContextItems.LobbyCode, out var lobbyCode))
+            {
+                var quizRuuner = _quizManager.GetQuizRunner((string)lobbyCode);
+                await Clients.Caller.SendAsync("loadQuestion", quizRuuner.GetQuestion(Context.User.Identity.Name));
+            }
+            else
+                await Clients.Group((string)lobbyCode).SendAsync("displayError", "Connection Lost");
+        }
+
+        public async Task ProcessAnswers(int[] test) 
+        {
+            if (Context.Items.TryGetValue(QuizContextItems.LobbyCode, out var lobbyCode))
+            {
+                await Clients.Group((string)lobbyCode).SendAsync("test");
+            }
+            else
+                await Clients.Group((string)lobbyCode).SendAsync("displayError", "Connection Lost");
         }
 
         private async Task BeginQuiz(string lobbyCode)

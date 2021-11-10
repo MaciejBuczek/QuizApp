@@ -113,7 +113,7 @@
             hideLoader();
             moveLoader(answerAwait);
             quizContent.style.display = "block";
-            connection.invoke("GetQuestion", lobbyCode);
+            connection.invoke("GetQuestion");
 
         });
 
@@ -126,6 +126,10 @@
             startTimer(personalisedQuestion.time, sendAnswers);
         });
 
+        connection.on("displayError", (error) => {
+            generateSwalRedirect("error", "Error", error);
+        });
+
         function submitAnswers() {
             stopTimer();
             sendAnswers();
@@ -136,13 +140,14 @@
             let answers = [];
 
             for (var i = 0; i < answersCheckboxes.length; i++) {
-                answers.push(answersCheckboxes[i].value);
+                answers.push(parseInt(answersCheckboxes[i].value));
             }
-            alert(answers);
 
             answerContent.style.display = "none";
             answerAwait.style.display = "block";
             showLoader("Waiting for other uses to answer...");
+
+            connection.invoke("ProcessAnswers", answers);
         }
 
     </script>
