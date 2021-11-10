@@ -1,6 +1,6 @@
 ﻿namespace QuizApp.Constants.HubEnumerables
 {
-    public enum LobbyContextItems
+    public enum QuizContextItems
     {
         LobbyCode, Removable
     }

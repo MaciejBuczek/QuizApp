@@ -17,8 +17,8 @@ namespace QuizApp.Hubs
 
         public override async Task OnDisconnectedAsync(Exception exception)
         {
-            if(Context.Items.TryGetValue(LobbyContextItems.LobbyCode, out var lobbyCode) &&
-                Context.Items.TryGetValue(LobbyContextItems.Removable, out var removable))
+            if(Context.Items.TryGetValue(QuizContextItems.LobbyCode, out var lobbyCode) &&
+                Context.Items.TryGetValue(QuizContextItems.Removable, out var removable))
             {
                 if (!(bool)removable)
                     return;
@@ -42,8 +42,8 @@ namespace QuizApp.Hubs
 
         public async Task ConnectOwnerToLobby(string lobbyCode)
         {
-            Context.Items.Add(LobbyContextItems.LobbyCode, lobbyCode);
-            Context.Items.Add(LobbyContextItems.Removable, true);
+            Context.Items.Add(QuizContextItems.LobbyCode, lobbyCode);
+            Context.Items.Add(QuizContextItems.Removable, true);
 
             await Groups.AddToGroupAsync(Context.ConnectionId, lobbyCode);
             await Clients.Caller.SendAsync("initializeUsers", _quizManager.GetLobby(lobbyCode));
@@ -51,8 +51,8 @@ namespace QuizApp.Hubs
 
         public async Task ConnectToLobby(string lobbyCode)
         {
-            Context.Items.Add(LobbyContextItems.LobbyCode, lobbyCode);
-            Context.Items.Add(LobbyContextItems.Removable, true);
+            Context.Items.Add(QuizContextItems.LobbyCode, lobbyCode);
+            Context.Items.Add(QuizContextItems.Removable, true);
 
             _quizManager.GetLobby(lobbyCode).ConnectedUsers.Add(Context.User.Identity.Name);
 
@@ -66,7 +66,7 @@ namespace QuizApp.Hubs
             var lobby = _quizManager.GetLobby(lobbyCode);
             lobby.UsersConnectedAtStart = lobby.ConnectedUsers.Count + 1;
 
-            Context.Items[LobbyContextItems.Removable] = false;
+            Context.Items[QuizContextItems.Removable] = false;
 
             await Clients.Group(lobbyCode).SendAsync("redirectToQuiz", ("/Lobby/Quiz?lobbyCode=" + lobbyCode));
         }

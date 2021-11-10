@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.SignalR;
+using QuizApp.Constants.HubEnumerables;
 using QuizApp.Data.Implementations;
 using QuizApp.Data.Interfaces;
 using QuizApp.Models;
@@ -19,8 +20,29 @@ namespace QuizApp.Hubs
             _quizManager = quizManager;
         }
 
+        public override Task OnDisconnectedAsync(Exception exception)
+        {
+            if (Context.Items.TryGetValue(QuizContextItems.LobbyCode, out var lobbyCode))
+            { 
+                var quizRunner = _quizManager.GetQuizRunner((string)lobbyCode);
+                quizRunner.UserScores.Remove(quizRunner.UserScores.Where(us => us.Username == Context.User.Identity.Name).FirstOrDefault());
+                quizRunner.UserScores = quizRunner.UserScores.OrderByDescending(us => us.Score).ThenBy(us => us.Username).ToList();
+
+                Clients.Group((string)lobbyCode).SendAsync("updateScoreboard", quizRunner.UserScores);
+
+                if(quizRunner.UserScores.Count == 0)
+                {
+                    _quizManager.RemoveQuiz((string)lobbyCode);
+                }
+            }
+            
+            return base.OnDisconnectedAsync(exception);
+        }
+
         public async Task ConnectToQuiz(string lobbyCode)
         {
+            Context.Items.Add(QuizContextItems.LobbyCode, lobbyCode);
+
             var quizRunner = _quizManager.GetQuizRunner(lobbyCode);
             var quizLobby = _quizManager.GetLobby(lobbyCode);
             quizRunner.UserScores.Add( new UserScore { Username = Context.User.Identity.Name, Score = 0 });
@@ -55,7 +77,6 @@ namespace QuizApp.Hubs
 
             await Clients.Group(lobbyCode).SendAsync("beginQuiz");
         } 
-
 
     }
 }
