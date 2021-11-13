@@ -23,16 +23,16 @@
                     <div class="card-body">
                         <div class="row mb-4">
                             <div class="col-2">
-                                <div class="form-check pl-4 mt-5 mb-4" onclick="changeCheckBoxes('negativePoints')">
-                                    <input class="form-check-input" type="checkbox" value="" id="negativePoints" @(Model.NegativePoints? "checked" : "")>
-                                    <label class="form-check-label" for="partialPoints">
-                                        Assign partial points
-                                    </label>
-                                </div>
-                                <div class="form-check pl-4" onclick="changeCheckBoxes('partialPoints')">
-                                    <input class="form-check-input" type="checkbox" value="" id="partialPoints" @(Model.PartialPoints? "checked" : "")>
+                                <div class="form-check pl-4 mt-5 mb-4" onclick="changeCheckBoxes('partialPoints')">
+                                    <input class="form-check-input" type="checkbox" value="" id="negativePoints" @(Model.NegativePoints ? "checked" : "")>
                                     <label class="form-check-label" for="negativePoints">
                                         Assign negative points
+                                    </label>
+                                </div>
+                                <div class="form-check pl-4" onclick="changeCheckBoxes('negativePoints')">
+                                    <input class="form-check-input" type="checkbox" value="" id="partialPoints" @(Model.PartialPoints ? "checked" : "")>
+                                    <label class="form-check-label" for="partialPoints">
+                                        Assign partial points
                                     </label>
                                 </div>
                             </div>
