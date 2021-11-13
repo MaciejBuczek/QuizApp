@@ -10,7 +10,8 @@ namespace QuizApp.Data.Implementations
     {
         private int _requestCounter;
 
-        private int _questionCounter { get; set; }
+        private int _questionCounter;
+
 
         public List<UserScore> UserScores { get; set; }
 
@@ -111,6 +112,39 @@ namespace QuizApp.Data.Implementations
                 _questionCounter++;
 
             return personalisedQuestion;
+        }
+
+        public void CalculatePoints(string username, int[] answers)
+        {
+            if (string.IsNullOrEmpty(username))
+                throw new ArgumentException(nameof(username));
+
+            var points = Quiz.Questions[_questionCounter].Points;
+            var correctAnswers = PersonalisedAnswers[username][_questionCounter - 1].CorrectAnswers;
+            var userScore = UserScores.Where(us => us.Username == username).FirstOrDefault();
+
+            userScore.IsModiefied = true;
+
+            if (correctAnswers.SequenceEqual(answers))
+                 userScore.Score += points;
+            else
+            {
+                if (Quiz.NegativePoints)
+                    userScore.Score -= points;
+                else if (Quiz.PartialPoints)
+                {
+                    var correctAnswersCounter = 0;
+
+                    foreach (var answer in answers)
+                    {
+                        if (correctAnswers.Contains(answer))
+                            correctAnswersCounter++;
+                        else
+                            return;
+                    }
+                    userScore.Score += Math.Round((double)(correctAnswers.Count / correctAnswersCounter), 2);
+                }
+            }
         }
     }
 }

@@ -73,15 +73,26 @@ namespace QuizApp.Hubs
                 await Clients.Group((string)lobbyCode).SendAsync("displayError", "Connection Lost");
         }
 
-        public async Task ProcessAnswers(int[] test) 
+        public async Task ProcessAnswers(int[] answers) 
         {
             if (Context.Items.TryGetValue(QuizContextItems.LobbyCode, out var lobbyCode))
             {
-                await Clients.Group((string)lobbyCode).SendAsync("test");
+                var quizRunner = _quizManager.GetQuizRunner((string)lobbyCode);
+                
+                quizRunner.CalculatePoints(Context.User.Identity.Name, answers);
+
+                if (quizRunner.UserScores.All(us => us.IsModiefied))
+                {
+                    await Clients.Group((string)lobbyCode).SendAsync("updateScoreboard", quizRunner.UserScores);
+
+                    quizRunner.UserScores.ForEach(us => us.IsModiefied = false);
+
+                    await GetQuestion();
+                }
             }
             else
                 await Clients.Group((string)lobbyCode).SendAsync("displayError", "Connection Lost");
-        }
+        } 
 
         private async Task BeginQuiz(string lobbyCode)
         {

@@ -119,10 +119,12 @@
 
         connection.on("loadQuestion", (personalisedQuestion) => {
             quizQuestion.innerHTML = personalisedQuestion.question;
-            quizAnswers.style = "";
+            quizAnswers.innerHTML = "";
             for (var i = 0; i < personalisedQuestion.answers.length; i++) {
                 quizAnswers.innerHTML += generateAnswer(personalisedQuestion.answers[i], i);
             }
+            hideLoader();
+            answerContent.style.display = "block";
             startTimer(personalisedQuestion.time, sendAnswers);
         });
 
