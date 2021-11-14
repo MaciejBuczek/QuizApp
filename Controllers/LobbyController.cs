@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 
 namespace QuizApp.Controllers
 {
+    [Authorize]
     public class LobbyController : Controller
     {
         private readonly IQuizManager _quizManager;
