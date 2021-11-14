@@ -20,17 +20,20 @@
         </form>
     </div>
     <div class="col-4">
-        <button class="btn btn-primary float-right" style="cursor:pointer" id="createLobbyButton" onclick="createLobby()" disabled>
-            <i class="fas fa-user-friends">
-                Create Lobby
-            </i>
-        </button>
-        <button class="btn btn-primary float-right mr-4" style="cursor:pointer" id="startQuizButton" onclick="" disabled>
-            <i class="fas fa-user">
-                Start Quiz
-            </i>
-        </button>
-    </div>
+        @if (User.Identity.IsAuthenticated)
+        {
+            <button class="btn btn-primary float-right" style="cursor:pointer" id="createLobbyButton" onclick="createLobby()" disabled>
+                <i class="fas fa-user-friends">
+                    Create Lobby
+                </i>
+            </button>
+            <button class="btn btn-primary float-right mr-4" style="cursor:pointer" id="startQuizButton" onclick="" disabled>
+                <i class="fas fa-user">
+                    Start Quiz
+                </i>
+            </button>
+        }
+        </div>    
 </div>
 <table class="table table-striped table-hover user-select-none mt-2" style="cursor:pointer">
     @foreach (var quiz in Model.Quizzes)

@@ -23,28 +23,35 @@
 </div>
 
 @section Scripts{ 
+    <script src="~/js/utils/sweer-alert-generation.js"></script>
     <script>
+
+        const isAuthenticated = @(User.Identity.IsAuthenticated?1:0);
+        const redirect = "/Identity/Account/Login";
+
         function connectToLobby() {
-            var code = document.getElementById("lobbyCode").value;
-            if (validateLobbyCode()) {
-                $.ajax({
-                    url: "/Lobby/CheckCode",
-                    type: "POST",
-                    dataType: "json",
-                    async: false,
-                    data: { lobbyCode: code },
-                    success: function (result) {
-                        window.location.replace(result.redirectUrl);
-                    },
-                    error: function () {
-                        Swal.fire(
-                            'Lobby Connection Error',
-                            'No lobby with provided code exists',
-                            'error'
-                        )
-                    }
-                });
+
+            if (isAuthenticated) {
+                var code = document.getElementById("lobbyCode").value;
+                if (validateLobbyCode()) {
+                    $.ajax({
+                        url: "/Lobby/CheckCode",
+                        type: "POST",
+                        dataType: "json",
+                        async: false,
+                        data: { lobbyCode: code },
+                        success: function (result) {
+                            window.location.replace(result.redirectUrl);
+                        },
+                        error: generateSwal("error", "Error", "No lobby with provided code exists")
+                    });
+                }
+            }
+            else
+            {
+                window.location.replace(redirect);
             }
         }
+
     </script>
 }
