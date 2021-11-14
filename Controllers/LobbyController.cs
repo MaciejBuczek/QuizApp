@@ -63,7 +63,6 @@ namespace QuizApp.Controllers
             var lobby = new Lobby()
             {
                 OwnerUsername = User.Identity.Name,
-                Private = true,
             };
             var quiz = _db.Quizzes.Where(q => q.Id == quizId).Include(q => q.Questions).ThenInclude(q => q.Answers).Include(q => q.CreatedBy).FirstOrDefault();
 
