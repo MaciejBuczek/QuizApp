@@ -43,7 +43,7 @@ namespace QuizApp.Hubs
             return base.OnDisconnectedAsync(exception);
         }
 
-        public async Task ConnectToQuiz(string lobbyCode)
+        public Task ConnectToQuiz(string lobbyCode)
         {
             Context.Items.Add(QuizContextItems.LobbyCode, lobbyCode);
 
@@ -56,14 +56,16 @@ namespace QuizApp.Hubs
                 UsersScores = quizRunner.UserScores
             };
             quizInfo.UsersScores.OrderByDescending(us => us.Username);
-            await Groups.AddToGroupAsync(Context.ConnectionId, lobbyCode);
-            await Clients.Caller.SendAsync("initalizeQuiz", quizInfo);
-            await Clients.GroupExcept(lobbyCode, Context.ConnectionId).SendAsync("updateScoreboard", quizInfo.UsersScores);
+            Groups.AddToGroupAsync(Context.ConnectionId, lobbyCode);
+            Clients.Caller.SendAsync("initalizeQuiz", quizInfo);
+            Clients.GroupExcept(lobbyCode, Context.ConnectionId).SendAsync("updateScoreboard", quizInfo.UsersScores);
 
             if(quizLobby.UsersConnectedAtStart == quizRunner.UserScores.Count)
             {
-               await BeginQuiz(lobbyCode);
+               return BeginQuiz(lobbyCode);
             }
+
+            return Task.CompletedTask;
         }
 
         public async Task GetQuestion()
@@ -113,7 +115,7 @@ namespace QuizApp.Hubs
                 quizRunner.PrepareQuizForUsers(quiz);
 
                 await Clients.Group(lobbyCode).SendAsync("beginQuiz");
-            }catch(Exception)
+            }catch(Exception e)
             {
                 await Clients.Group((string)lobbyCode).SendAsync("displayError", "Connection Lost");
             }
