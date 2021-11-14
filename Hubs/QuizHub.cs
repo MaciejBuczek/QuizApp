@@ -99,12 +99,20 @@ namespace QuizApp.Hubs
                         await Clients.Group((string)lobbyCode).SendAsync("redirectToSummary");
                     }
                     else
-                        await GetQuestion();
+                        await SendQuestionToAll((string)lobbyCode, quizRunner);
                 }
             }
             else
                 await Clients.Group((string)lobbyCode).SendAsync("displayError", "Connection Lost");
         } 
+
+        private async Task SendQuestionToAll(string lobbyCode, QuizRunner quizRunner)
+        {
+            if(string.IsNullOrEmpty(lobbyCode) || quizRunner == null)
+                await Clients.Group((string)lobbyCode).SendAsync("displayError", "Connection Lost");
+
+            await Clients.Group(lobbyCode).SendAsync("loadQuestion", quizRunner.GetQuestion(Context.User.Identity.Name));
+        }
 
         private async Task BeginQuiz(string lobbyCode)
         {
