@@ -61,12 +61,6 @@
         function connectToQuiz() {
             connection.invoke("ConnectToQuiz", lobbyCode);
         }
-        function startSuccess() {
-            connectToLobby();
-        }
-        function startFail() {
-            generateSwalRedirect('error', 'Quiz Error', 'Could not connect to quiz');
-        }
 
         function generateSwalRedirect(icon, title, text) {
             Swal.fire({

@@ -1,4 +1,4 @@
-﻿@model List<QuizApp.Data.Implementations.UserScore>
+﻿@model QuizApp.Models.ViewModels.SummaryVM
 
 <div class="row mt-5">
     <div class="col-6 border-right">
@@ -9,14 +9,14 @@
             Thank you for participating!
         </h3>
         <h3 class="mb-3">
-            Your total score is: <span class="text-primary">@Model.Where(us => us.Username == Context.User.Identity.Name).FirstOrDefault().Score</span>
+            Your total score is: <span class="text-primary">@Model.UserScores.Where(us => us.Username == Context.User.Identity.Name).FirstOrDefault().Score</span>
         </h3>
         <h3>
-            There @(Model.Count == 1?"was":"were")
-            <span class="text-primary">@Model.Count</span>
-            @(Model.Count == 1?"person":"people")
+            There @(Model.UserScores.Count == 1?"was":"were")
+            <span class="text-primary">@Model.UserScores.Count</span>
+            @(Model.UserScores.Count == 1?"person":"people")
             total participating,
-            @if (Model.Count == 1)
+            @if (Model.UserScores.Count == 1)
             {
                 <span>and it was you!</span>
             }
@@ -24,9 +24,9 @@
             {
 
                 <span>out of which You took</span>
-                for (int i = 1; i <= Model.Count; i++)
+                for (int i = 1; i <= Model.UserScores.Count; i++)
                 {
-                    if (Model[i - 1].Username == Context.User.Identity.Name)
+                    if (Model.UserScores[i - 1].Username == Context.User.Identity.Name)
                     {
                         if (i == 1)
                         {
@@ -61,17 +61,53 @@
                 <i class="fas fa-trophy"></i>
             </h1>
         </div>
-        @for (int i = 1; i <= Model.Count; i++)
+        @for (int i = 1; i <= Model.UserScores.Count; i++)
         {
             <div class="row">
                 <div class="col-9">
                     <span class="text-primary h2 @(i<=3?"font-weight-bold":"")">@i . </span>
-                    <span class="text-primary h2">@Model[i - 1].Username</span>
+                    <span class="text-primary h2">@Model.UserScores[i - 1].Username</span>
                 </div>
                 <div class="col-3">
-                    <span class="h2">@Model[i - 1].Score</span>
+                    <span class="h2">@Model.UserScores[i - 1].Score</span>
                 </div>
             </div>          
         }
     </div>
 </div>
+
+@section scripts{ 
+    <script>
+
+        const lobbyCode = "@Model.LobbyCode";
+        const redirectHomeURL = '@Url.Action("Index","Home")';
+
+
+        let connection = new signalR.HubConnectionBuilder()
+            .configureLogging(signalR.LogLevel.Trace)
+            .withUrl("/hubs/summary")
+            .build();
+
+        function startSuccess() {
+            connection.invoke("ConnectToSummary", lobbyCode);
+        }
+
+        function startFail() {
+            generateSwalRedirect('error', 'Quiz Error', 'Could not connect to quiz');
+        }
+
+        function generateSwalRedirect(icon, title, text) {
+            Swal.fire({
+                icon: icon,
+                title: title,
+                text: text,
+            }).then(() => {
+                window.location.replace(redirectHomeURL)
+            });
+        }
+
+        connection.start().then(startSuccess, startFail);
+
+
+    </script>
+}

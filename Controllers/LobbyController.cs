@@ -99,7 +99,13 @@ namespace QuizApp.Controllers
 
             var quizRunner = _quizManager.GetQuizRunner(lobbyCode);
 
-            return View(quizRunner.UserScores.OrderBy(us => us.Score).ThenBy(us => us.Username));
+            var vm = new SummaryVM
+            {
+                LobbyCode = lobbyCode,
+                UserScores = quizRunner.UserScores.OrderBy(us => us.Score).ThenBy(us => us.Username).ToList()
+            };
+
+            return View(vm);
         }
     }
 }
