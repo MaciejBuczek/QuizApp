@@ -109,7 +109,10 @@ namespace QuizApp.Data.Implementations
             };
 
             if (++_requestCounter == UserScores.Count)
+            {
                 _questionCounter++;
+                _requestCounter = 0;
+            }
 
             return personalisedQuestion;
         }
@@ -119,7 +122,7 @@ namespace QuizApp.Data.Implementations
             if (string.IsNullOrEmpty(username))
                 throw new ArgumentException(nameof(username));
 
-            var points = Quiz.Questions[_questionCounter].Points;
+            var points = Quiz.Questions[_questionCounter - 1].Points;
             var correctAnswers = PersonalisedAnswers[username][_questionCounter - 1].CorrectAnswers;
             var userScore = UserScores.Where(us => us.Username == username).FirstOrDefault();
 
@@ -133,7 +136,7 @@ namespace QuizApp.Data.Implementations
                     userScore.Score -= points;
                 else if (Quiz.PartialPoints)
                 {
-                    var correctAnswersCounter = 0;
+                    var correctAnswersCounter = 0d;
 
                     foreach (var answer in answers)
                     {
@@ -142,7 +145,7 @@ namespace QuizApp.Data.Implementations
                         else
                             return;
                     }
-                    userScore.Score += Math.Round((double)(correctAnswers.Count / correctAnswersCounter), 2);
+                    userScore.Score += Math.Round((double)(correctAnswersCounter / correctAnswers.Count) * points, 2);
                 }
             }
         }
