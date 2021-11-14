@@ -19,6 +19,8 @@ namespace QuizApp.Data.Implementations
 
         public Quiz Quiz { get; set; }
 
+        public bool IsFinished { get; private set; }
+
         public QuizRunner(Quiz quiz)
         {
             _requestCounter = 0;
@@ -27,6 +29,7 @@ namespace QuizApp.Data.Implementations
             UserScores = new List<UserScore>();
             PersonalisedAnswers = new Dictionary<string, List<ShuffledAnswers>>();
             Quiz = quiz;
+            IsFinished = false;
         }
 
         private List<AnswerCheck> ParseAnswers(List<Answer> answers, int correctAnswer)
@@ -112,6 +115,9 @@ namespace QuizApp.Data.Implementations
             {
                 _questionCounter++;
                 _requestCounter = 0;
+
+                if (_questionCounter == Quiz.Questions.Count)
+                    IsFinished = true;
             }
 
             return personalisedQuestion;

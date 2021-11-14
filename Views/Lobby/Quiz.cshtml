@@ -40,7 +40,8 @@
     <script>
 
         const lobbyCode = "@Model";
-        const redirectURL = '@Url.Action("Index","Home")';
+        const redirectHomeURL = '@Url.Action("Index","Home")';
+        const redirectSummary = '@Url.Action("Summary", "Lobby", new { lobbyCode = Model })';
         const quizContent = document.getElementById("quiz-content");
         const quizTitle = document.getElementById("quiz-title");
         const quizQuestion = document.getElementById("quiz-question");
@@ -73,7 +74,7 @@
                 title: title,
                 text: text,
             }).then(() => {
-                window.location.replace(redirectURL)
+                window.location.replace(redirectHomeURL)
             });
         }
 
@@ -130,6 +131,10 @@
 
         connection.on("displayError", (error) => {
             generateSwalRedirect("error", "Error", error);
+        });
+
+        connection.on("redirectToSummary", () => {
+            window.location.replace(redirectSummary)
         });
 
         function submitAnswers() {

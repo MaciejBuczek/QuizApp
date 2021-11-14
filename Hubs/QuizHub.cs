@@ -15,6 +15,7 @@ namespace QuizApp.Hubs
     {
         private readonly IQuizManager _quizManager;
 
+
         public QuizHub(IQuizManager quizManager)
         {
             _quizManager = quizManager;
@@ -22,26 +23,31 @@ namespace QuizApp.Hubs
 
         public override Task OnDisconnectedAsync(Exception exception)
         {
-            if (Context.Items.TryGetValue(QuizContextItems.LobbyCode, out var lobbyCode))
-            { 
-                var quizRunner = _quizManager.GetQuizRunner((string)lobbyCode);
-                quizRunner.UserScores.Remove(quizRunner.UserScores.Where(us => us.Username == Context.User.Identity.Name).FirstOrDefault());
-                quizRunner.UserScores = quizRunner.UserScores.OrderByDescending(us => us.Score).ThenBy(us => us.Username).ToList();
-
-                Clients.Group((string)lobbyCode).SendAsync("updateScoreboard", quizRunner.UserScores);
-
-                if(quizRunner.UserScores.Count == 0)
+            if (Context.Items.TryGetValue(QuizContextItems.LobbyCode, out var lobbyCode) &&
+                Context.Items.TryGetValue(QuizContextItems.Removable, out var removable))
+            {
+                if ((bool)removable)
                 {
-                    _quizManager.RemoveQuiz((string)lobbyCode);
+                    var quizRunner = _quizManager.GetQuizRunner((string)lobbyCode);
+                    quizRunner.UserScores.Remove(quizRunner.UserScores.Where(us => us.Username == Context.User.Identity.Name).FirstOrDefault());
+                    quizRunner.UserScores = quizRunner.UserScores.OrderByDescending(us => us.Score).ThenBy(us => us.Username).ToList();
+
+                    Clients.Group((string)lobbyCode).SendAsync("updateScoreboard", quizRunner.UserScores);
+
+                    if (quizRunner.UserScores.Count == 0)
+                    {
+                        _quizManager.RemoveQuiz((string)lobbyCode);
+                    }
                 }
             }
-            
+
             return base.OnDisconnectedAsync(exception);
         }
 
         public async Task ConnectToQuiz(string lobbyCode)
         {
             Context.Items.Add(QuizContextItems.LobbyCode, lobbyCode);
+            Context.Items.Add(QuizContextItems.Removable, true);
 
             var quizRunner = _quizManager.GetQuizRunner(lobbyCode);
             var quizLobby = _quizManager.GetLobby(lobbyCode);
@@ -87,7 +93,13 @@ namespace QuizApp.Hubs
 
                     quizRunner.UserScores.ForEach(us => us.IsModiefied = false);
 
-                    await GetQuestion();
+                    if (quizRunner.IsFinished)
+                    {
+                        Context.Items[QuizContextItems.Removable] = false;
+                        await Clients.Group((string)lobbyCode).SendAsync("redirectToSummary");
+                    }
+                    else
+                        await GetQuestion();
                 }
             }
             else

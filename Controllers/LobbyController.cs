@@ -43,7 +43,11 @@ namespace QuizApp.Controllers
 
         public IActionResult Join(string lobbyCode)
         {
+            if (string.IsNullOrEmpty(lobbyCode))
+                return NotFound();
+
             var lobby = _quizManager.GetLobby(lobbyCode);
+
             var lobbyVM = new LobbyVM()
             {
                 Quiz = _quizManager.GetQuizRunner(lobbyCode).Quiz,
@@ -62,6 +66,10 @@ namespace QuizApp.Controllers
                 Private = true,
             };
             var quiz = _db.Quizzes.Where(q => q.Id == quizId).Include(q => q.Questions).ThenInclude(q => q.Answers).Include(q => q.CreatedBy).FirstOrDefault();
+
+            if (quiz == null)
+                return NotFound();
+            
             var quizRunner = new QuizRunner(quiz);
             var code = _quizManager.GetQuizCode();
 
@@ -78,7 +86,20 @@ namespace QuizApp.Controllers
 
         public IActionResult Quiz(string lobbyCode)
         {
-            return View(nameof(Quiz),lobbyCode);
+            if (string.IsNullOrEmpty(lobbyCode))
+                return NotFound();
+
+            return View(nameof(Quiz), lobbyCode);
+        }
+
+        public IActionResult Summary(string lobbyCode)
+        {
+            if (string.IsNullOrEmpty(lobbyCode))
+                return NotFound();
+
+            var quizRunner = _quizManager.GetQuizRunner(lobbyCode);
+
+            return View(quizRunner.UserScores);
         }
     }
 }
