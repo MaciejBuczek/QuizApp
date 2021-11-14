@@ -115,7 +115,10 @@
             moveLoader(answerAwait);
             quizContent.style.display = "block";
             connection.invoke("GetQuestion");
+        });
 
+        connection.on("requestQuestion", () => {
+            connection.invoke("GetQuestion");
         });
 
         connection.on("loadQuestion", (personalisedQuestion) => {

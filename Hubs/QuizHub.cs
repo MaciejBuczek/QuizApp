@@ -23,12 +23,11 @@ namespace QuizApp.Hubs
 
         public override Task OnDisconnectedAsync(Exception exception)
         {
-            if (Context.Items.TryGetValue(QuizContextItems.LobbyCode, out var lobbyCode) &&
-                Context.Items.TryGetValue(QuizContextItems.Removable, out var removable))
+            if (Context.Items.TryGetValue(QuizContextItems.LobbyCode, out var lobbyCode))
             {
-                if ((bool)removable)
+                var quizRunner = _quizManager.GetQuizRunner((string)lobbyCode);
+                if (!quizRunner.IsFinished)
                 {
-                    var quizRunner = _quizManager.GetQuizRunner((string)lobbyCode);
                     quizRunner.UserScores.Remove(quizRunner.UserScores.Where(us => us.Username == Context.User.Identity.Name).FirstOrDefault());
                     quizRunner.UserScores = quizRunner.UserScores.OrderByDescending(us => us.Score).ThenBy(us => us.Username).ToList();
 
@@ -47,7 +46,6 @@ namespace QuizApp.Hubs
         public async Task ConnectToQuiz(string lobbyCode)
         {
             Context.Items.Add(QuizContextItems.LobbyCode, lobbyCode);
-            Context.Items.Add(QuizContextItems.Removable, true);
 
             var quizRunner = _quizManager.GetQuizRunner(lobbyCode);
             var quizLobby = _quizManager.GetLobby(lobbyCode);
@@ -95,33 +93,30 @@ namespace QuizApp.Hubs
 
                     if (quizRunner.IsFinished)
                     {
-                        Context.Items[QuizContextItems.Removable] = false;
                         await Clients.Group((string)lobbyCode).SendAsync("redirectToSummary");
                     }
                     else
-                        await SendQuestionToAll((string)lobbyCode, quizRunner);
+                        await Clients.Group((string)lobbyCode).SendAsync("requestQuestion");
                 }
             }
             else
                 await Clients.Group((string)lobbyCode).SendAsync("displayError", "Connection Lost");
         } 
 
-        private async Task SendQuestionToAll(string lobbyCode, QuizRunner quizRunner)
-        {
-            if(string.IsNullOrEmpty(lobbyCode) || quizRunner == null)
-                await Clients.Group((string)lobbyCode).SendAsync("displayError", "Connection Lost");
-
-            await Clients.Group(lobbyCode).SendAsync("loadQuestion", quizRunner.GetQuestion(Context.User.Identity.Name));
-        }
-
         private async Task BeginQuiz(string lobbyCode)
         {
-            var quizRunner = _quizManager.GetQuizRunner(lobbyCode);
-            var quiz = _quizManager.GetQuizRunner(lobbyCode).Quiz;
+            try
+            {
+                var quizRunner = _quizManager.GetQuizRunner(lobbyCode);
+                var quiz = _quizManager.GetQuizRunner(lobbyCode).Quiz;
 
-            quizRunner.PrepareQuizForUsers(quiz);
+                quizRunner.PrepareQuizForUsers(quiz);
 
-            await Clients.Group(lobbyCode).SendAsync("beginQuiz");
+                await Clients.Group(lobbyCode).SendAsync("beginQuiz");
+            }catch(Exception)
+            {
+                await Clients.Group((string)lobbyCode).SendAsync("displayError", "Connection Lost");
+            }
         } 
 
     }
