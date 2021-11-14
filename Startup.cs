@@ -33,7 +33,8 @@ namespace QuizApp
             services.AddControllersWithViews();
             services.AddMvc().AddRazorRuntimeCompilation();
             services.AddSignalR();
-            services.AddSingleton<ILobbyManager, LobbyManager>();
+            //services.AddSingleton<ILobbyManager, LobbyManager>();
+            services.AddSingleton<IQuizManager, QuizManager>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -61,6 +62,7 @@ namespace QuizApp
             {
                 endpoints.MapRazorPages();
                 endpoints.MapHub<LobbyHub>("hubs/lobby");
+                endpoints.MapHub<QuizHub>("hubs/quiz");
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");

@@ -31,6 +31,6 @@ namespace QuizApp.Models
         [ForeignKey("UserId")]
         public IdentityUser CreatedBy { get; set; }
 
-        public virtual ICollection<Question> Questions { get; set; }
+        public virtual IList<Question> Questions { get; set; }
     }
 }

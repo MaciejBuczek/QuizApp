@@ -8,23 +8,27 @@ namespace QuizApp.Hubs
 {
     public class LobbyHub : Hub
     {
-        private readonly ILobbyManager _lobbyManager;
+        private readonly IQuizManager _quizManager;
 
-        public LobbyHub(ILobbyManager lobbyManager)
+        public LobbyHub(IQuizManager quizManager)
         {
-            _lobbyManager = lobbyManager;
+            _quizManager = quizManager;
         }
 
         public override async Task OnDisconnectedAsync(Exception exception)
         {
-            if(Context.Items.TryGetValue(LobbyContextItems.LobbyCode, out var lobbyCode))
+            if(Context.Items.TryGetValue(QuizContextItems.LobbyCode, out var lobbyCode) &&
+                Context.Items.TryGetValue(QuizContextItems.Removable, out var removable))
             {
-                var lobby = _lobbyManager.GetLobby((string)lobbyCode);
+                if (!(bool)removable)
+                    return;
+
+                var lobby = _quizManager.GetLobby((string)lobbyCode);
                 if (lobby != null)
                 {
                     if (lobby.OwnerUsername == Context.User.Identity.Name)
                     {
-                        _lobbyManager.RemoveLobby((string)lobbyCode);
+                        _quizManager.RemoveQuiz((string)lobbyCode);
                         await Clients.GroupExcept((string)lobbyCode, Context.ConnectionId).SendAsync("closeLobby");
                     }
                     else
@@ -38,22 +42,32 @@ namespace QuizApp.Hubs
 
         public async Task ConnectOwnerToLobby(string lobbyCode)
         {
-            Context.Items.Add(LobbyContextItems.LobbyCode, lobbyCode);
+            Context.Items.Add(QuizContextItems.LobbyCode, lobbyCode);
+            Context.Items.Add(QuizContextItems.Removable, true);
+
             await Groups.AddToGroupAsync(Context.ConnectionId, lobbyCode);
-            await Clients.Caller.SendAsync("initializeUsers", _lobbyManager.GetLobby(lobbyCode));
+            await Clients.Caller.SendAsync("initializeUsers", _quizManager.GetLobby(lobbyCode));
         }
 
         public async Task ConnectToLobby(string lobbyCode)
         {
-            Context.Items.Add(LobbyContextItems.LobbyCode, lobbyCode);
-            _lobbyManager.GetLobby(lobbyCode).ConnectedUsers.Add(Context.User.Identity.Name);
+            Context.Items.Add(QuizContextItems.LobbyCode, lobbyCode);
+            Context.Items.Add(QuizContextItems.Removable, true);
+
+            _quizManager.GetLobby(lobbyCode).ConnectedUsers.Add(Context.User.Identity.Name);
+
             await Groups.AddToGroupAsync(Context.ConnectionId, lobbyCode);
             await Clients.GroupExcept(lobbyCode, Context.ConnectionId).SendAsync("addUser", Context.User.Identity.Name);
-            await Clients.Caller.SendAsync("initializeUsers", _lobbyManager.GetLobby(lobbyCode));
+            await Clients.Caller.SendAsync("initializeUsers", _quizManager.GetLobby(lobbyCode));
         }
 
         public async Task BeginQuiz(string lobbyCode)
         {
+            var lobby = _quizManager.GetLobby(lobbyCode);
+            lobby.UsersConnectedAtStart = lobby.ConnectedUsers.Count + 1;
+
+            Context.Items[QuizContextItems.Removable] = false;
+
             await Clients.Group(lobbyCode).SendAsync("redirectToQuiz", ("/Lobby/Quiz?lobbyCode=" + lobbyCode));
         }
     }

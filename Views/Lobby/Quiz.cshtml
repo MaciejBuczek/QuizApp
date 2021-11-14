@@ -1,10 +1,164 @@
 ﻿@model string
 
-<h1>Quiz</h1>
+<partial name="_LoaderPartial" />
 
-@section Scripts{ 
+<div id="quiz-content" style="display:none">
+    <div class="row">
+        <div class="col-10 border-right">
+            <h1 class="text-primary" id="quiz-title"></h1>
+            <h2 class="border-bottom pb-1" id="quiz-question"></h2>
+        </div>
+        <div class="col-2">
+            <partial name="_TimerPartial" />
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-10 border-right">
+            <div id="answers-await" style="display:none;">
+            </div>
+            <div id="answers-content">
+                <div id="quiz-answers">
+
+                </div>
+                <div class="btn btn-primary mt-4" onclick="submitAnswers()">
+                    Submit
+                </div>
+            </div>           
+        </div>
+        <div class="col-2 mt-3">
+            <h1 class="text-primary font-weight-bold">Scoreboard</h1>
+            <div id="scoreboard">
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script src="~/js/utils/timer.js"></script>
+    <script src="~/js/utils/loader.js"></script>
+    <script src="~/js/DOMGeneration/DOMQuiz.js"~></script>
     <script>
-        var lobbyCode = "@Model";
+
+        const lobbyCode = "@Model";
+        const redirectHomeURL = '@Url.Action("Index","Home")';
+        const redirectSummary = '@Url.Action("Summary", "Lobby", new { lobbyCode = Model })';
+        const quizContent = document.getElementById("quiz-content");
+        const quizTitle = document.getElementById("quiz-title");
+        const quizQuestion = document.getElementById("quiz-question");
+        const quizAnswers = document.getElementById("quiz-answers");
+        const scoreboard = document.getElementById("scoreboard");
+        const answerAwait = document.getElementById("answers-await");
+        const answerContent = document.getElementById("answers-content");
+
+        showLoader("Connecting...");
+
+        let connection = new signalR.HubConnectionBuilder()
+            .configureLogging(signalR.LogLevel.Trace)
+            .withUrl("/hubs/quiz")
+            .build();
+
+
+        function connectToQuiz() {
+            connection.invoke("ConnectToQuiz", lobbyCode);
+        }
+        function startSuccess() {
+            connectToLobby();
+        }
+        function startFail() {
+            generateSwalRedirect('error', 'Quiz Error', 'Could not connect to quiz');
+        }
+
+        function generateSwalRedirect(icon, title, text) {
+            Swal.fire({
+                icon: icon,
+                title: title,
+                text: text,
+            }).then(() => {
+                window.location.replace(redirectHomeURL)
+            });
+        }
+
+        function updateScoreboard(usersScores) {
+            scoreboard.innerHTML = '';
+            for (let i = 0; i < usersScores.length; i++) {
+                scoreboard.innerHTML += generateUserPointsLabel(usersScores[i].username, usersScores[i].score);
+            }
+        }
+
+        function startSuccess() {
+            console.log("connected");
+            connectToQuiz();
+        }
+
+        function startFail() {
+            console.log("connection failed");
+            generateSwalRedirect('error', 'Connection Error', 'Could not load the quiz data');
+        }
+
+        connection.start().then(startSuccess, startFail);
+
+        connection.on("initalizeQuiz", (quizInfo) => {
+            if(quizInfo == null || quizInfo == "")
+                generateSwalRedirect('error', 'Connection Error', 'Error ocured while loading quiz data');
+
+                quizTitle.innerHTML = quizInfo.quizTitle;
+                updateScoreboard(quizInfo.usersScores);
+        });
+
+        connection.on("updateScoreboard", (usersScores) => {
+            updateScoreboard(usersScores);
+        });
+
+        connection.on("beginQuiz", () => {
+
+            hideLoader();
+            moveLoader(answerAwait);
+            quizContent.style.display = "block";
+            connection.invoke("GetQuestion");
+        });
+
+        connection.on("requestQuestion", () => {
+            connection.invoke("GetQuestion");
+        });
+
+        connection.on("loadQuestion", (personalisedQuestion) => {
+            quizQuestion.innerHTML = personalisedQuestion.question;
+            quizAnswers.innerHTML = "";
+            for (var i = 0; i < personalisedQuestion.answers.length; i++) {
+                quizAnswers.innerHTML += generateAnswer(personalisedQuestion.answers[i], i);
+            }
+            hideLoader();
+            answerContent.style.display = "block";
+            startTimer(personalisedQuestion.time, sendAnswers);
+        });
+
+        connection.on("displayError", (error) => {
+            generateSwalRedirect("error", "Error", error);
+        });
+
+        connection.on("redirectToSummary", () => {
+            window.location.replace(redirectSummary)
+        });
+
+        function submitAnswers() {
+            stopTimer();
+            sendAnswers();
+        }
+
+        function sendAnswers() {
+            let answersCheckboxes = document.querySelectorAll(".answer:checked");
+            let answers = [];
+
+            for (var i = 0; i < answersCheckboxes.length; i++) {
+                answers.push(parseInt(answersCheckboxes[i].value));
+            }
+
+            answerContent.style.display = "none";
+            answerAwait.style.display = "block";
+            showLoader("Waiting for other uses to answer...");
+
+            connection.invoke("ProcessAnswers", answers);
+        }
+
     </script>
 }
-

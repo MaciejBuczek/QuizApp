@@ -1,0 +1,77 @@
+﻿@model List<QuizApp.Data.Implementations.UserScore>
+
+<div class="row mt-5">
+    <div class="col-6 border-right">
+        <h1 class="text-primary text-center mb-4">
+            The quiz is finished <i class="fas fa-flag-checkered"></i>
+        </h1>
+        <h3 class="mb-3">
+            Thank you for participating!
+        </h3>
+        <h3 class="mb-3">
+            Your total score is: <span class="text-primary">@Model.Where(us => us.Username == Context.User.Identity.Name).FirstOrDefault().Score</span>
+        </h3>
+        <h3>
+            There @(Model.Count == 1?"was":"were")
+            <span class="text-primary">@Model.Count</span>
+            @(Model.Count == 1?"person":"people")
+            total participating,
+            @if (Model.Count == 1)
+            {
+                <span>and it was you!</span>
+            }
+            else
+            {
+
+                <span>out of which You took</span>
+                for (int i = 1; i <= Model.Count; i++)
+                {
+                    if (Model[i - 1].Username == Context.User.Identity.Name)
+                    {
+                        if (i == 1)
+                        {
+                            <span>1st</span>
+                        }
+                        else if (i == 2)
+                        {
+                            <span>2nd</span>
+                        }
+                        else if (i == 3)
+                        {
+                            <span>3rd</span>
+                        }
+                        else
+                        {
+                            <span>@i rd</span>
+                        }
+                    }
+                }
+                <span>place.</span>
+            }
+            
+        </h3>
+        <h3>
+            Did you enjoy this quiz? If so, would you like to rate it?
+        </h3>
+    </div>
+    <div class="col-6">
+        <div class="row">
+            <h1 class="text-primary mb-4" style="width:100%; text-align:center">
+                Scoreboard
+                <i class="fas fa-trophy"></i>
+            </h1>
+        </div>
+        @for (int i = 1; i <= Model.Count; i++)
+        {
+            <div class="row">
+                <div class="col-9">
+                    <span class="text-primary h2 @(i<=3?"font-weight-bold":"")">@i . </span>
+                    <span class="text-primary h2">@Model[i - 1].Username</span>
+                </div>
+                <div class="col-3">
+                    <span class="h2">@Model[i - 1].Score</span>
+                </div>
+            </div>          
+        }
+    </div>
+</div>

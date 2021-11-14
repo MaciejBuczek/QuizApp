@@ -127,6 +127,14 @@
 
         function startFail() {
             console.log("connection failed");
+            Swal.fire({
+                icon: 'error',
+                title: 'Lobby Error',
+                text: 'The Owner has closed this lobby',
+            }).then(() => {
+                window.location.replace(redirectURL);
+
+            });
         }
 
         function connectToLobby() {
