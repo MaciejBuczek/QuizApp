@@ -37,6 +37,7 @@
     <script src="~/js/utils/timer.js"></script>
     <script src="~/js/utils/loader.js"></script>
     <script src="~/js/DOMGeneration/DOMQuiz.js"~></script>
+    <script src="~/js/utils/sweer-alert-generation.js"></script>
     <script>
 
         const lobbyCode = "@Model";
@@ -62,16 +63,6 @@
             connection.invoke("ConnectToQuiz", lobbyCode);
         }
 
-        function generateSwalRedirect(icon, title, text) {
-            Swal.fire({
-                icon: icon,
-                title: title,
-                text: text,
-            }).then(() => {
-                window.location.replace(redirectHomeURL)
-            });
-        }
-
         function updateScoreboard(usersScores) {
             scoreboard.innerHTML = '';
             for (let i = 0; i < usersScores.length; i++) {
@@ -86,14 +77,14 @@
 
         function startFail() {
             console.log("connection failed");
-            generateSwalRedirect('error', 'Connection Error', 'Could not load the quiz data');
+            generateSwalRedirect('error', 'Connection Error', 'Could not load the quiz data', redirectHomeURL)
         }
 
         connection.start().then(startSuccess, startFail);
 
         connection.on("initalizeQuiz", (quizInfo) => {
-            if(quizInfo == null || quizInfo == "")
-                generateSwalRedirect('error', 'Connection Error', 'Error ocured while loading quiz data');
+            if (quizInfo == null || quizInfo == "")
+                generateSwalRedirect('error', 'Connection Error', 'Error ocured while loading quiz data', redirectHomeURL)
 
                 quizTitle.innerHTML = quizInfo.quizTitle;
                 updateScoreboard(quizInfo.usersScores);
@@ -127,7 +118,7 @@
         });
 
         connection.on("displayError", (error) => {
-            generateSwalRedirect("error", "Error", error);
+            generateSwalRedirect('error', 'Error', error, redirectHomeURL)
         });
 
         connection.on("redirectToSummary", () => {

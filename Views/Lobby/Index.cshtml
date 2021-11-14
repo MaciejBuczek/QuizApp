@@ -79,6 +79,7 @@
 </div>
 
 @section Scripts{ 
+    <script src="~/js/utils/sweer-alert-generation.js"></script>
     <script>
         var lobbyId = "@Model.LobbyCode";
         var isOwner = @(Model.IsOwner? 1 : 0);
@@ -107,16 +108,7 @@
             window.location.replace(url);
         });
 
-        connection.on("closeLobby", () => {
-            Swal.fire({
-                icon: 'error',
-                title: 'Lobby Error',
-                text: 'The Owner has closed this lobby',
-            }).then(() => {
-                window.location.replace(redirectURL);
-
-            });
-        });
+        connection.on("closeLobby", () => { generateSwalRedirect("error", "Lobby Error", "The owner has closed this lobby", redirectURL) });
 
         connection.start().then(startSuccess, startFail);
 
@@ -127,14 +119,7 @@
 
         function startFail() {
             console.log("connection failed");
-            Swal.fire({
-                icon: 'error',
-                title: 'Lobby Error',
-                text: 'The Owner has closed this lobby',
-            }).then(() => {
-                window.location.replace(redirectURL);
-
-            });
+            generateSwalRedirect("error", "Lobby Error", "The Owner has closed this lobby", redirectURL)
         }
 
         function connectToLobby() {
