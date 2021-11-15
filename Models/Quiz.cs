@@ -32,5 +32,7 @@ namespace QuizApp.Models
         public IdentityUser CreatedBy { get; set; }
 
         public virtual IList<Question> Questions { get; set; }
+
+        public virtual IList<Rating> Ratings { get; set; }
     }
 }
