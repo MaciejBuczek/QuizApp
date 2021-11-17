@@ -53,6 +53,8 @@
         <h3>
             Did you enjoy this quiz? If so, would you like to rate it?
         </h3>
+        <div id="rating-box" class="mt-4" style="font-size:4em">
+        </div>
     </div>
     <div class="col-6">
         <div class="row">
@@ -78,10 +80,12 @@
 
 @section scripts{ 
     <script src="~/js/utils/sweer-alert-generation.js"></script>
+    <script src="~/js/utils/ratings.js"></script>
     <script>
 
         const lobbyCode = "@Model.LobbyCode";
         const redirectHomeURL = '@Url.Action("Index","Home")';
+        const ratingBox = document.getElementById("rating-box");
 
 
         let connection = new signalR.HubConnectionBuilder()
@@ -99,6 +103,7 @@
 
         connection.start().then(startSuccess, startFail);
 
+        renderRatings(ratingBox);
 
     </script>
 }
