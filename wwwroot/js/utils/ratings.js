@@ -1,4 +1,6 @@
-﻿const starEmpty = "<i class='far fa-star' onclick='onClick(this)' onmouseover='onHover(this)' onmouseout='onHoverExit(this)' value=></i>";
+﻿const quizId = 1;
+const ratingUrl = "/Rating/Add";
+const starEmpty = "<i class='far fa-star' onclick='onClick(this)' onmouseover='onHover(this)' onmouseout='onHoverExit(this)' value=></i>";
 const startFull = "<i class='fas fa-star' onclick='onClick(this)' onmouseover='onHover(this)' onmouseout='onHoverExit(this)' value=></i>";
 let lockedStars = [false, false, false, false, false];
 
@@ -18,8 +20,11 @@ function onHoverExit(element) {
 }
 
 function onClick(element) {
+    let value = parseInt(element.getAttribute("value"));
+
     fillPreviousStars(element, true);
-    alert(parseInt(element.getAttribute("value")));
+    alert(value);
+    sendRating(value)
 }
 
 function fillPreviousStars(element, lock) {
@@ -45,6 +50,30 @@ function fillPreviousStars(element, lock) {
             }
         }
     } 
+}
+
+function sendRating(ratingValue) {
+    $.ajax({
+        url: ratingUrl,
+        type: "POST",
+        dataType: "json",
+        async: false,
+        data: { rating: ratingValue, quizId: quizId },
+        success: function (result) {
+            Swal.fire(
+                'Success',
+                'You rating has been saved',
+                'success'
+            );
+        },
+        error: function (result) {
+            Swal.fire(
+                'Error',
+                'Something went wrong. Your rating cannot be saved',
+                'error'
+            );
+        }
+    });
 }
 
 function renderRatings(element)
