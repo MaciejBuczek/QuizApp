@@ -3,10 +3,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using QuizApp.Data;
 using QuizApp.Models;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
+using System.Net;
 
 namespace QuizApp.Controllers
 {
@@ -20,11 +18,6 @@ namespace QuizApp.Controllers
         {
             _userManager = userManager;
             _db = db;
-        }
-
-        public IActionResult Index()
-        {
-            return View();
         }
 
         [HttpPost]
@@ -48,7 +41,7 @@ namespace QuizApp.Controllers
             });
             _db.SaveChanges();
 
-            return View();
+            return Ok();
         }
     }
 }

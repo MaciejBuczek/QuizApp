@@ -1,8 +1,8 @@
-﻿const quizId = 1;
-const ratingUrl = "/Rating/Add";
+﻿const ratingUrl = "/Rating/Add";
 const starEmpty = "<i class='far fa-star' onclick='onClick(this)' onmouseover='onHover(this)' onmouseout='onHoverExit(this)' value=></i>";
 const startFull = "<i class='fas fa-star' onclick='onClick(this)' onmouseover='onHover(this)' onmouseout='onHoverExit(this)' value=></i>";
 let lockedStars = [false, false, false, false, false];
+let quizId;
 
 function onHover(element) {
     fillPreviousStars(element, false);
@@ -23,7 +23,6 @@ function onClick(element) {
     let value = parseInt(element.getAttribute("value"));
 
     fillPreviousStars(element, true);
-    alert(value);
     sendRating(value)
 }
 
@@ -56,17 +55,16 @@ function sendRating(ratingValue) {
     $.ajax({
         url: ratingUrl,
         type: "POST",
-        dataType: "json",
         async: false,
         data: { rating: ratingValue, quizId: quizId },
-        success: function (result) {
+        success: function (response) {
             Swal.fire(
                 'Success',
                 'You rating has been saved',
                 'success'
             );
         },
-        error: function (result) {
+        error: function (response) {
             Swal.fire(
                 'Error',
                 'Something went wrong. Your rating cannot be saved',
@@ -80,7 +78,7 @@ function renderRatings(element)
 {
     let search = "value=";
     element.innerHtml = '';
-    for (var i = 0; i < 5; i++) {
+    for (var i = 1; i <= 5; i++) {
 
         let starString = starEmpty;
         var index = starString.indexOf(search);

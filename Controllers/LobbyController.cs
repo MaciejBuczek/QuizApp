@@ -102,7 +102,8 @@ namespace QuizApp.Controllers
             var vm = new SummaryVM
             {
                 LobbyCode = lobbyCode,
-                UserScores = quizRunner.UserScores.OrderByDescending(us => us.Score).ThenBy(us => us.Username).ToList()
+                UserScores = quizRunner.UserScores.OrderByDescending(us => us.Score).ThenBy(us => us.Username).ToList(),
+                QuizId = quizRunner.Quiz.Id
             };
 
             return View(vm);

@@ -53,7 +53,7 @@
         <h3>
             Did you enjoy this quiz? If so, would you like to rate it?
         </h3>
-        <div id="rating-box" class="mt-4" style="font-size:4em">
+        <div id="rating-box" class="mt-4" style="font-size:3em">
         </div>
     </div>
     <div class="col-6">
@@ -103,6 +103,7 @@
 
         connection.start().then(startSuccess, startFail);
 
+        quizId = @Model.QuizId
         renderRatings(ratingBox);
 
     </script>
