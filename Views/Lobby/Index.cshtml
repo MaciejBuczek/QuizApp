@@ -1,5 +1,11 @@
 ﻿@model QuizApp.Models.ViewModels.LobbyVM
 
+@using System.Linq
+
+@{ 
+    var averageScore = Math.Round(Model.Quiz.Ratings.Average(q => q.Content),0);
+}
+
 <div class="row mt-5">
     <div class="col-6">
         <label style="font-size:20px">Share this code with other users to allow them to join</label>
@@ -32,12 +38,11 @@
 <div class="row mt-5 pt-4 border-top">
     <div class="col-8 h6">
         <div class="float-right pr-4">
-            <i class="far fa-star"></i>
-            <i class="far fa-star"></i>
-            <i class="far fa-star"></i>
-            <i class="far fa-star"></i>
-            <i class="far fa-star"></i>
-            &nbsp;(0)
+            <div class="float-right">
+                &nbsp;(@Model.Quiz.Ratings.Count)
+            </div>
+            <div class="float-right" id="rating-box">
+            </div>
         </div>
         <br />
         <br />
@@ -80,10 +85,14 @@
 
 @section Scripts{ 
     <script src="~/js/utils/sweer-alert-generation.js"></script>
+    <script src="~/js/utils/ratings-display-only.js"></script>
     <script>
-        var lobbyId = "@Model.LobbyCode";
-        var isOwner = @(Model.IsOwner? 1 : 0);
-        var redirectURL = '@Url.Action("Index","Home")';
+        const lobbyId = "@Model.LobbyCode";
+        const isOwner = @(Model.IsOwner? 1 : 0);
+        const redirectURL = '@Url.Action("Index","Home")';
+        const ratingBox = document.getElementById("rating-box");
+
+        renderRatings(ratingBox, @averageScore)
 
         var connection = new signalR.HubConnectionBuilder()
             .configureLogging(signalR.LogLevel.Trace)

@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using QuizApp.Data;
 using QuizApp.Data.Implementations;
 using QuizApp.Data.Interfaces;
+using QuizApp.Models;
 using QuizApp.Models.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -65,7 +66,16 @@ namespace QuizApp.Controllers
             {
                 OwnerUsername = User.Identity.Name,
             };
-            var quiz = _db.Quizzes.Where(q => q.Id == quizId).Include(q => q.Questions).ThenInclude(q => q.Answers).Include(q => q.CreatedBy).FirstOrDefault();
+            var quiz = _db.Quizzes
+                .Where(q => q.Id == quizId)
+                .Include(q => q.Questions)
+                .ThenInclude(q => q.Answers)
+                .Include(q => q.CreatedBy)
+                .Include(q => q.Ratings)
+                .FirstOrDefault();
+
+            if (quiz.Ratings == null)
+                quiz.Ratings = new List<Rating>();
 
             if (quiz == null)
                 return NotFound();
@@ -79,7 +89,7 @@ namespace QuizApp.Controllers
             {
                 Quiz = quiz,
                 LobbyCode = code,
-                IsOwner = true
+                IsOwner = true          
             };
             return View(nameof(Index), lobbyVM);
         }
@@ -98,11 +108,20 @@ namespace QuizApp.Controllers
                 return NotFound();
 
             var quizRunner = _quizManager.GetQuizRunner(lobbyCode);
+            var userId = _userManager.GetUserId(User);
+            
+            var previousRating = _db.Ratings.Where(r => r.UserId == userId && r.IdQuiz == quizRunner.Quiz.Id).FirstOrDefault();
+
+            int? previousRatingScore = null;
+            if (previousRating != null)
+                previousRatingScore = previousRating.Content;
 
             var vm = new SummaryVM
             {
                 LobbyCode = lobbyCode,
-                UserScores = quizRunner.UserScores.OrderBy(us => us.Score).ThenBy(us => us.Username).ToList()
+                UserScores = quizRunner.UserScores.OrderByDescending(us => us.Score).ThenBy(us => us.Username).ToList(),
+                QuizId = quizRunner.Quiz.Id,
+                PreviousRating = previousRatingScore
             };
 
             return View(vm);

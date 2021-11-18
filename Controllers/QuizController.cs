@@ -34,7 +34,8 @@ namespace QuizApp.Controllers
         }
         public IActionResult Search(string quizTitle, string authorUsername, int? targetPage)
         {
-            var quizQuery = _db.Quizzes.Include(q => q.CreatedBy).Where(q => (q.Title.Contains(quizTitle) || quizTitle == null) &&
+            var quizQuery = _db.Quizzes.Include(q => q.CreatedBy).Include(q => q.Ratings)
+                .Where(q => (q.Title.Contains(quizTitle) || quizTitle == null) &&
             (q.CreatedBy.UserName.Contains(authorUsername) || authorUsername == null));
             var quizDisplayVM = new QuizDisplayVM()
             {
@@ -42,7 +43,7 @@ namespace QuizApp.Controllers
                 AuthorUsername = authorUsername,
                 CurrentPage = targetPage ?? 1,
                 TotalPages = (quizQuery.Count() + _resultPerPage - 1) / _resultPerPage,
-                Quizzes = quizQuery.Include(q => q.Questions).Include(q => q.CreatedBy)
+                Quizzes = quizQuery.Include(q => q.Questions).Include(q => q.CreatedBy).Include(q => q.Ratings)
                     .Skip(_resultPerPage * (targetPage - 1) ?? 0).Take(_resultPerPage).ToList()
 
             };

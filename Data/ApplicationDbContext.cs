@@ -21,5 +21,7 @@ namespace QuizApp.Data
         public DbSet<Question> Questions { get; set; }
 
         public DbSet<Answer> Answers { get; set; }
+
+        public DbSet<Rating> Ratings { get; set; }
     }
 }

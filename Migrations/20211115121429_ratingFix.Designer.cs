@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using QuizApp.Data;
 
 namespace QuizApp.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20211115121429_ratingFix")]
+    partial class ratingFix
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -310,18 +312,12 @@ namespace QuizApp.Migrations
                     b.Property<int>("Content")
                         .HasColumnType("int");
 
-                    b.Property<int?>("IdQuiz")
+                    b.Property<int>("IdQuiz")
                         .HasColumnType("int");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("IdQuiz");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("Ratings");
                 });
@@ -408,11 +404,7 @@ namespace QuizApp.Migrations
                 {
                     b.HasOne("QuizApp.Models.Quiz", "Quiz")
                         .WithMany("Ratings")
-                        .HasForeignKey("IdQuiz");
-
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "RatedBy")
-                        .WithMany()
-                        .HasForeignKey("UserId")
+                        .HasForeignKey("IdQuiz")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
