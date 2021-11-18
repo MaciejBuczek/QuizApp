@@ -9,7 +9,7 @@ function onHover(element) {
 }
 
 function onHoverExit(element) {
-    let stars = document.querySelectorAll("i.far, i.fas");
+    let stars = document.querySelectorAll("i.fa-star");
 
     for (var i = 0; i < stars.length; i++) {
         if (!lockedStars[i] && stars[i].classList.contains("fas")) {
@@ -29,7 +29,7 @@ function onClick(element) {
 
 function fillPreviousStars(element, lock) {
     let value = parseInt(element.getAttribute("value"));
-    let stars = document.querySelectorAll("i.far, i.fas");
+    let stars = document.querySelectorAll("i.fa-star");
     for (var i = 0; i < stars.length; i++) {     
 
         if (parseInt(stars[i].getAttribute("value")) <= value) {
