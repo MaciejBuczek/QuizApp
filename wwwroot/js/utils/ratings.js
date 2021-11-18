@@ -74,7 +74,7 @@ function sendRating(ratingValue) {
     });
 }
 
-function renderRatings(element)
+function renderRatings(element, score)
 {
     let search = "value=";
     element.innerHtml = '';
@@ -86,5 +86,10 @@ function renderRatings(element)
         var starValueString = starString.slice(0, index + search.length) + i + starString.slice(index + search.length);
 
         element.innerHTML += starValueString;
+    }
+
+    if (score != null) {
+        let element = document.querySelector(`i[value='${score}']`)
+        fillPreviousStars(element, true);
     }
 }

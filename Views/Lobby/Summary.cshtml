@@ -104,7 +104,7 @@
         connection.start().then(startSuccess, startFail);
 
         quizId = @Model.QuizId
-        renderRatings(ratingBox);
+        renderRatings(ratingBox,@Model.PreviousRating);
 
     </script>
 }
