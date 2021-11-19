@@ -10,5 +10,6 @@ namespace QuizApp.Data.Interfaces
         public Lobby GetLobby(string code);
         public QuizRunner GetQuizRunner(string code);
         public string GetQuizCode();
+        public string RegenerateCode(string previousCode);
     } 
 }

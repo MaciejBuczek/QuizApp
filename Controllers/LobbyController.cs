@@ -43,6 +43,17 @@ namespace QuizApp.Controllers
             return Json(new { redirectUrl = Url.Action("Join", "Lobby", new { lobbyCode = lobbyCode }) });
         }
 
+        [HttpGet]
+        public IActionResult RegenerateCode(string previousCode)
+        {
+            if (string.IsNullOrEmpty(previousCode) || _quizManager.GetLobby(previousCode) == null)
+                return NotFound();
+
+            var newCode = _quizManager.RegenerateCode(previousCode);
+
+            return Json(new { newCode = newCode });
+        }
+
         public IActionResult Join(string lobbyCode)
         {
             if (string.IsNullOrEmpty(lobbyCode))

@@ -12,8 +12,15 @@
         <div class="input-group w-75">
             <input type="text" class="form-control" id="lobbyCode" style="height:60px; font-size:30px;" value="@Model.LobbyCode" readonly />
             <div class="input-group-append">
-                <button class="btn btn-primary" id="copyButton" type="button" style="font-size:20px;" onclick="copy()" 
-                       data-toggle="tooltip" data-placement="bottom" title="Copy to Clipboard">Copy</button>
+                <button class="btn btn-primary" type="button" style="font-size:20px;" onclick="regenerateCode()" title="Re-generate code">
+                    <i class="fas fa-sync"></i>
+                </button>
+            </div>
+            <div class="input-group-append">
+                <button class="btn btn-primary" id="copyButton" type="button" style="font-size:20px;" onclick="copy()"
+                        data-toggle="tooltip" data-placement="bottom" title="Copy to Clipboard">
+                    Copy
+                </button>
             </div>
         </div>
     </div>
@@ -86,11 +93,13 @@
 @section Scripts{ 
     <script src="~/js/utils/sweer-alert-generation.js"></script>
     <script src="~/js/utils/ratings-display-only.js"></script>
+    <script src="~/js/utils/sweer-alert-generation.js"></script>
     <script>
-        const lobbyId = "@Model.LobbyCode";
+        let lobbyId = "@Model.LobbyCode";
         const isOwner = @(Model.IsOwner? 1 : 0);
         const redirectURL = '@Url.Action("Index","Home")';
         const ratingBox = document.getElementById("rating-box");
+        const lobbyCodeBox = document.getElementById("lobbyCode");
 
         renderRatings(ratingBox, @averageScore)
 
@@ -159,6 +168,22 @@
                     .attr('data-original-title', 'Please use ctr + c')
                     .tooltip('show');
             }
+        }
+
+        function regenerateCode(){
+            $.ajax({
+                url: "/Lobby/RegenerateCode",
+                type: "GET",
+                dataType: "json",
+                async: false,
+                data: { previousCode: lobbyId },
+                success: function (response) {
+                    lobbyId = response.newCode;
+                    lobbyCodeBox.value = response.newCode;
+                    generateSwal("success", "Success", "Lobby code has been regenerated");
+                },
+                error: generateSwal("error", "Error", "Lobby code cannot be regenerated")
+            });
         }
     </script>
 }

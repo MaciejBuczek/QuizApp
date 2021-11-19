@@ -50,5 +50,16 @@ namespace QuizApp.Data.Interfaces
         {
             _quizDic.Remove(code);
         }
+
+        public string RegenerateCode(string previousCode)
+        {
+            var newCode = GetQuizCode();
+            var quiz = _quizDic[previousCode];
+
+            _quizDic.Remove(previousCode);
+            _quizDic.Add(newCode, quiz);
+
+            return newCode;
+        }
     }
 }
