@@ -34,12 +34,12 @@ namespace QuizApp.Controllers
             return View();
         }
 
-        [HttpPost]
+        [HttpGet]
         public IActionResult CheckCode(string lobbyCode)
         {
             if(_quizManager.GetLobby(lobbyCode) == null)
             {
-                return null;
+                return NotFound();
             }
             return Json(new { redirectUrl = Url.Action("Join", "Lobby", new { lobbyCode = lobbyCode }) });
         }

@@ -28,7 +28,11 @@ namespace QuizApp.Data.Interfaces
 
         public Lobby GetLobby(string code)
         {
-            return _quizDic[code].Lobby;
+            if(_quizDic.TryGetValue(code, out var tuple))
+            {
+                return tuple.Lobby;
+            }
+            return null;
         }
 
         public string GetQuizCode()
