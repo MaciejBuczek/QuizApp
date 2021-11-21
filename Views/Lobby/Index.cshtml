@@ -11,11 +11,14 @@
         <label style="font-size:20px">Share this code with other users to allow them to join</label>
         <div class="input-group w-75">
             <input type="text" class="form-control" id="lobbyCode" style="height:60px; font-size:30px;" value="@Model.LobbyCode" readonly />
-            <div class="input-group-append">
-                <button class="btn btn-primary" type="button" style="font-size:20px;" onclick="regenerateCode()" title="Re-generate code">
-                    <i class="fas fa-sync"></i>
-                </button>
-            </div>
+            @if (Model.IsOwner)
+            {
+                <div class="input-group-append">
+                    <button class="btn btn-primary" type="button" style="font-size:20px;" onclick="regenerateCode()" title="Re-generate code">
+                        <i class="fas fa-sync"></i>
+                    </button>
+                </div>
+            }
             <div class="input-group-append">
                 <button class="btn btn-primary" id="copyButton" type="button" style="font-size:20px;" onclick="copy()"
                         data-toggle="tooltip" data-placement="bottom" title="Copy to Clipboard">
@@ -84,7 +87,7 @@
     </div>
     <div class="col-4 border-left">
         <h1>Connected users:</h1>
-        <div id="userBox" onclick="test()">
+        <div id="userBox">
 
         </div>
     </div>
@@ -127,6 +130,8 @@
         });
 
         connection.on("closeLobby", () => { generateSwalRedirect("error", "Lobby Error", "The owner has closed this lobby", redirectURL) });
+
+        connection.on("kick", () => generateSwalRedirect("error", "Lobby Error", "You have been kicked from the lobby", redirectURL))
 
         connection.start().then(startSuccess, startFail);
 
@@ -186,5 +191,21 @@
             });
         }
 
+        function kickUser(username) {
+            connection.invoke("KickUser", username);
+        }
+
+        function generateUserLabel(username) {
+            var label = '<h2>';
+            if (isOwner)
+                label += `<button class="btn btn-danger"><i class="fas fa-user-slash" onclick="kickUser('${username}')"></i></button>&nbsp;`;
+            label += username + '</h2>';
+            return label;
+        }
+
+        function generateHostUserLabel(username) {
+            var label = `<h2><i class="fas fa-crown"></i>&nbsp;${username}</h2>`
+            return label;
+        }
     </script>
 }
