@@ -3,7 +3,7 @@
 @using System.Linq
 
 @{ 
-    var averageScore = Math.Round(Model.Quiz.Ratings.Average(q => q.Content),0);
+    var averageScore = Model.Quiz.Ratings.Count>0?Math.Round(Model.Quiz.Ratings.Average(q => q.Content),0):0;
 }
 
 <div class="row mt-5">
