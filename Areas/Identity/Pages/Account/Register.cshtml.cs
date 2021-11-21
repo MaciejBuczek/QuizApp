@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
+using QuizApp.Constants;
 
 namespace QuizApp.Areas.Identity.Pages.Account
 {
@@ -71,10 +72,20 @@ namespace QuizApp.Areas.Identity.Pages.Account
 
         public async Task OnGetAsync(string returnUrl = null)
         {
-            if (!await _roleManager.RoleExistsAsync(WC.AdminRole))
-                await _roleManager.CreateAsync(new IdentityRole(WC.AdminRole));
-            if (!await _roleManager.RoleExistsAsync(WC.UserRole))
-                await _roleManager.CreateAsync(new IdentityRole(WC.UserRole));
+            if (!await _roleManager.RoleExistsAsync(Roles.AdminRole))
+            {
+                await _roleManager.CreateAsync(new IdentityRole(Roles.AdminRole));
+                var admin = Users.Admin.User;
+                var result = await _userManager.CreateAsync(admin, Users.Admin.Password);
+                if (result.Succeeded)
+                {
+                    await _userManager.AddToRoleAsync(admin, Roles.AdminRole);
+                    _logger.LogInformation("Admin created with default password.");
+
+                }
+            }
+            if (!await _roleManager.RoleExistsAsync(Roles.UserRole))
+                await _roleManager.CreateAsync(new IdentityRole(Roles.UserRole));
             ReturnUrl = returnUrl;
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
         }
@@ -90,7 +101,7 @@ namespace QuizApp.Areas.Identity.Pages.Account
                 if (result.Succeeded)
                 {
 
-                    await _userManager.AddToRoleAsync(user, WC.UserRole);
+                    await _userManager.AddToRoleAsync(user, Roles.UserRole);
 
                     _logger.LogInformation("User created a new account with password.");
 
