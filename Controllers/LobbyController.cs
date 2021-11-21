@@ -28,6 +28,7 @@ namespace QuizApp.Controllers
             _db = db;
         }
 
+        [HttpGet]
         public IActionResult Index()
         {
             return View();
@@ -54,6 +55,7 @@ namespace QuizApp.Controllers
             return Json(new { newCode = newCode });
         }
 
+        [HttpGet]
         public IActionResult Join(string lobbyCode)
         {
             if (string.IsNullOrEmpty(lobbyCode))
@@ -71,40 +73,18 @@ namespace QuizApp.Controllers
         }
 
         [Authorize]
+        [HttpGet]
         public IActionResult Create(int quizId)
         {
-            var lobby = new Lobby()
-            {
-                OwnerUsername = User.Identity.Name,
-            };
-            var quiz = _db.Quizzes
-                .Where(q => q.Id == quizId)
-                .Include(q => q.Questions)
-                .ThenInclude(q => q.Answers)
-                .Include(q => q.CreatedBy)
-                .Include(q => q.Ratings)
-                .FirstOrDefault();
-
-            if (quiz.Ratings == null)
-                quiz.Ratings = new List<Rating>();
-
-            if (quiz == null)
+            if (_db.Quizzes.Find(quizId) == null)
                 return NotFound();
-            
-            var quizRunner = new QuizRunner(quiz);
-            var code = _quizManager.GetQuizCode();
 
-            _quizManager.AddQuiz(lobby, quizRunner, code);
+            var vm = GenerateQuizVM(quizId);
 
-            var lobbyVM = new LobbyVM()
-            {
-                Quiz = quiz,
-                LobbyCode = code,
-                IsOwner = true          
-            };
-            return View(nameof(Index), lobbyVM);
+            return View(nameof(Index), vm);
         }
 
+        [HttpGet]
         public IActionResult Quiz(string lobbyCode)
         {
             if (string.IsNullOrEmpty(lobbyCode))
@@ -113,6 +93,7 @@ namespace QuizApp.Controllers
             return View(nameof(Quiz), lobbyCode);
         }
 
+        [HttpGet]
         public IActionResult Summary(string lobbyCode)
         {
             if (string.IsNullOrEmpty(lobbyCode))
@@ -136,6 +117,51 @@ namespace QuizApp.Controllers
             };
 
             return View(vm);
+        }
+        
+        [HttpGet]
+        public IActionResult Start(int quizId)
+        {
+            if (_db.Quizzes.Find(quizId) == null)
+                return NotFound();
+
+            var vm = GenerateQuizVM(quizId);
+
+            _quizManager.GetLobby(vm.LobbyCode).UsersConnectedAtStart = 1;
+
+            return View("Quiz", vm.LobbyCode);
+        }
+
+        private LobbyVM GenerateQuizVM(int quizId)
+        {
+            var lobby = new Lobby()
+            {
+                OwnerUsername = User.Identity.Name,
+            };
+            var quiz = _db.Quizzes
+                .Where(q => q.Id == quizId)
+                .Include(q => q.Questions)
+                .ThenInclude(q => q.Answers)
+                .Include(q => q.CreatedBy)
+                .Include(q => q.Ratings)
+                .FirstOrDefault();
+
+            if (quiz.Ratings == null)
+                quiz.Ratings = new List<Rating>();
+
+            var quizRunner = new QuizRunner(quiz);
+            var code = _quizManager.GetQuizCode();
+
+            _quizManager.AddQuiz(lobby, quizRunner, code);
+
+            var lobbyVM = new LobbyVM()
+            {
+                Quiz = quiz,
+                LobbyCode = code,
+                IsOwner = true
+            };
+
+            return lobbyVM;
         }
     }
 }

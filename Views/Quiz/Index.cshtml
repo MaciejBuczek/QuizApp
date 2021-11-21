@@ -32,7 +32,7 @@
                     Create Lobby
                 </i>
             </button>
-            <button class="btn btn-primary float-right mr-4" style="cursor:pointer" id="startQuizButton" onclick="" disabled>
+            <button class="btn btn-primary float-right mr-4" style="cursor:pointer" id="startQuizButton" onclick="startQuiz()" disabled>
                 <i class="fas fa-user">
                     Start Quiz
                 </i>
@@ -109,10 +109,6 @@
 @section Scripts{
     <script>
 
-        function test() {
-            alert("a");
-        }
-
         var editButton = document.getElementById("createLobbyButton");
         var removeButton = document.getElementById("startQuizButton");
         var selectedElement = null;
@@ -120,6 +116,11 @@
         function createLobby() {
             var quizId = selectedElement.getElementsByTagName("input")[0].value;
             window.location.replace("/Lobby/Create?quizId=" + quizId);
+        }
+
+        function startQuiz() {
+            var quizId = selectedElement.getElementsByTagName("input")[0].value;
+            window.location.replace("/Lobby/Start?quizId=" + quizId);
         }
 
         function selectQuiz(target) {
