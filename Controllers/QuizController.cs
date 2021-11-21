@@ -7,6 +7,7 @@ using QuizApp.Models;
 using QuizApp.Models.ViewModels;
 using System;
 using System.Linq;
+using QuizApp.Constants;
 
 namespace QuizApp.Controllers
 {
@@ -22,16 +23,20 @@ namespace QuizApp.Controllers
             _userManager = userManager;
         }
 
+        [HttpGet]
         public IActionResult Index()
         {
             return View();
         }
 
+        [HttpGet]
         public IActionResult MyQuizzes()
         {
             var quizzList = _db.Quizzes.Where(q => q.UserId == _userManager.GetUserId(User)).Include(q => q.Questions).ToList();
             return View(quizzList);
         }
+
+        [HttpGet]
         public IActionResult Search(string quizTitle, string authorUsername, int? targetPage)
         {
             var quizQuery = _db.Quizzes.Include(q => q.CreatedBy).Include(q => q.Ratings)
@@ -51,13 +56,14 @@ namespace QuizApp.Controllers
         }
 
         [Authorize]
+        [HttpGet]
         public IActionResult Create()
         {
             return View();
         }
 
-        [HttpPost]
         [Authorize]
+        [HttpPost]       
         public IActionResult Create(Quiz quiz)
         {
             quiz.UserId = _userManager.GetUserId(User);
@@ -76,6 +82,7 @@ namespace QuizApp.Controllers
         }
 
         [Authorize]
+        [HttpGet]
         public IActionResult Edit(int id)
         {
             if (_db.Quizzes.Find(id) == null)
@@ -103,8 +110,8 @@ namespace QuizApp.Controllers
             return View(quizVM);
         }
 
-        [HttpPost]
         [Authorize]
+        [HttpPost]       
         public IActionResult Edit(Quiz quiz)
         {
             quiz.UserId = _userManager.GetUserId(User);
@@ -125,8 +132,8 @@ namespace QuizApp.Controllers
             return Json(new { redirectUrl = Url.Action("MyQuizzes", "Quiz") });
         }
 
-        [HttpPost]
         [Authorize]
+        [HttpPost]       
         public IActionResult Remove(int id)
         {
             var quiz = _db.Quizzes.Find(id);
@@ -135,6 +142,23 @@ namespace QuizApp.Controllers
             _db.Remove(quiz);
             _db.SaveChanges();
             return Json(new { redirectUrl = Url.Action("MyQuizzes", "Quiz") });
+        }
+
+        [Authorize]
+        [HttpGet]
+        public IActionResult Delete(int id)
+        {
+            if (!User.IsInRole(Roles.AdminRole))
+                return Forbid();
+
+            var quiz = _db.Quizzes.Find(id);
+            if (quiz == null)
+                return NotFound();
+
+            _db.Quizzes.Remove(quiz);
+            _db.SaveChanges();
+
+            return RedirectToAction(nameof(Search), new { quizTitle = "", authorUsername = "" });
         }
     }
 }
