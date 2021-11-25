@@ -1,8 +1,8 @@
 ﻿namespace QuizApp.Constants
 {
-    public class Roles
+    public static class Roles
     {
-        public static string AdminRole = "AdminRole";
-        public static string UserRole = "UserRole";
+        public const string AdminRole = "AdminRole";
+        public const string UserRole = "UserRole";
     }
 }

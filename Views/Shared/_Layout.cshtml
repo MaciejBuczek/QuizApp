@@ -1,4 +1,6 @@
-﻿<!DOCTYPE html>
+﻿@using QuizApp.Constants;
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -36,6 +38,12 @@
                         <li class="nav-item">
                             <a class="nav-link" asp-area="" asp-controller="Quiz" asp-action="MyQuizzes">My Quizzes</a>
                         </li>
+                        @if (User.Identity.IsAuthenticated && User.IsInRole(Roles.AdminRole))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="" asp-controller="User" asp-action="Search">Menage Users</a>
+                            </li>
+                        }
                     </ul>
                 </div>
             </div>
