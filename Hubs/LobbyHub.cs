@@ -57,6 +57,8 @@ namespace QuizApp.Hubs
             _quizManager.GetLobby(lobbyCode).ConnectedUsers.Add(Context.User.Identity.Name);
 
             await Groups.AddToGroupAsync(Context.ConnectionId, lobbyCode);
+            await Groups.AddToGroupAsync(Context.ConnectionId, Context.User.Identity.Name);
+
             await Clients.GroupExcept(lobbyCode, Context.ConnectionId).SendAsync("addUser", Context.User.Identity.Name);
             await Clients.Caller.SendAsync("initializeUsers", _quizManager.GetLobby(lobbyCode));
         }
@@ -69,6 +71,11 @@ namespace QuizApp.Hubs
             Context.Items[QuizContextItems.Removable] = false;
 
             await Clients.Group(lobbyCode).SendAsync("redirectToQuiz", ("/Lobby/Quiz?lobbyCode=" + lobbyCode));
+        }
+
+        public async Task KickUser(string username)
+        {
+            await Clients.Groups(username).SendAsync("kick");
         }
     }
 }

@@ -28,7 +28,11 @@ namespace QuizApp.Data.Interfaces
 
         public Lobby GetLobby(string code)
         {
-            return _quizDic[code].Lobby;
+            if(_quizDic.TryGetValue(code, out var tuple))
+            {
+                return tuple.Lobby;
+            }
+            return null;
         }
 
         public string GetQuizCode()
@@ -49,6 +53,17 @@ namespace QuizApp.Data.Interfaces
         public void RemoveQuiz(string code)
         {
             _quizDic.Remove(code);
+        }
+
+        public string RegenerateCode(string previousCode)
+        {
+            var newCode = GetQuizCode();
+            var quiz = _quizDic[previousCode];
+
+            _quizDic.Remove(previousCode);
+            _quizDic.Add(newCode, quiz);
+
+            return newCode;
         }
     }
 }

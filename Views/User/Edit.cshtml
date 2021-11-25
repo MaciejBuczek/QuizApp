@@ -1,0 +1,63 @@
+﻿@model Microsoft.AspNetCore.Identity.IdentityUser
+
+<div class="row h1 text-primary">
+    Edit @Model.UserName profile
+</div>
+<div class="row mt-5">
+    <div class="accordion w-100" id="userAccordion">
+        <div class="card w-100">
+            <div class="card-header" id="headingProperties">
+                <h2 class="mb-0">
+                    <button class="btn btn-link" onclick="changeCaret(this)" type="button" data-toggle="collapse" data-target="#usernameProperties" aria-expanded="true" aria-controls="collapseProperties">
+                        Change Username &nbsp;<i class="fas fa-caret-down"></i>
+                    </button>
+                </h2>
+            </div>
+            <div id="usernameProperties" class="collapse" aria-labelledby="headingProperties" data-parent="#userAccordion">
+                <div class="card-body">
+                    <form asp-action="EditUsername" method="post">
+                        <input type="hidden" name="id" value="@Model.Id" />
+                        <input class="form-control" type="text" name="username" value="@Model.UserName" />
+                        <input type="submit" value="Submit" class="btn btn-primary mt-4" />
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="card w-100">
+            <div class="card-header" id="headingProperties">
+                <h2 class="mb-0">
+                    <button class="btn btn-link" onclick="changeCaret(this)" type="button" data-toggle="collapse" data-target="#emailProperties" aria-expanded="true" aria-controls="collapseProperties">
+                        Change Email &nbsp;<i class="fas fa-caret-down"></i>
+                    </button>
+                </h2>
+            </div>
+            <div id="emailProperties" class="collapse" aria-labelledby="headingProperties" data-parent="#userAccordion">
+                <div class="card-body">
+                    <form asp-action="EditEmail" method="post">
+                        <input type="hidden" name="id" value="@Model.Id" />
+                        <input class="form-control" type="email" name="email" value="@Model.Email" />
+                        <input type="submit" value="Submit" class="btn btn-primary mt-4" />
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="card w-100">
+            <div class="card-header" id="headingProperties">
+                <h2 class="mb-0">
+                    <button class="btn btn-link" onclick="changeCaret(this)" type="button" data-toggle="collapse" data-target="#passwordProperties" aria-expanded="true" aria-controls="collapseProperties">
+                        Change Password &nbsp;<i class="fas fa-caret-down"></i>
+                    </button>
+                </h2>
+            </div>
+            <div id="passwordProperties" class="collapse" aria-labelledby="headingProperties" data-parent="#userAccordion">
+                <div class="card-body">
+                    <form asp-action="EditPassword" method="post">
+                        <input type="hidden" name="id" value="@Model.Id" />
+                        <input class="form-control" type="password" name="password" />
+                        <input type="submit" value="Submit" class="btn btn-primary mt-4" />
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

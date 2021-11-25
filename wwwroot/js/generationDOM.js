@@ -75,13 +75,3 @@ function generateQuizAnswer(questionCounter) {
                 </div>`;
     return card;
 }
-
-function generateUserLabel(username) {
-    var label = '<h2>' + username + '</h2>'
-    return label;
-}
-
-function generateHostUserLabel(username) {
-    var label = '<h2><i class="fas fa-crown"></i>&nbsp; ' + username + '</h2>'
-    return label;
-}

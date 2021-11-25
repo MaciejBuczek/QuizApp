@@ -27,29 +27,28 @@
     <script>
 
         const isAuthenticated = @(User.Identity.IsAuthenticated?1:0);
-        const redirect = "/Identity/Account/Login";
+        const loginURL = "/Identity/Account/Login";
+        const checkCodeURL = "/Lobby/CheckCode";
+        const codeBox = document.getElementById("lobbyCode");
 
         function connectToLobby() {
 
             if (isAuthenticated) {
-                var code = document.getElementById("lobbyCode").value;
-                if (validateLobbyCode()) {
-                    $.ajax({
-                        url: "/Lobby/CheckCode",
-                        type: "POST",
-                        dataType: "json",
-                        async: false,
-                        data: { lobbyCode: code },
-                        success: function (result) {
-                            window.location.replace(result.redirectUrl);
-                        },
-                        error: generateSwal("error", "Error", "No lobby with provided code exists")
-                    });
-                }
+                var code = codeBox.value;
+                $.ajax({
+                    url: checkCodeURL,
+                    type: "GET",
+                    async: false,
+                    data: { lobbyCode: code },
+                    success: function (result) {
+                        window.location.replace(result.redirectUrl);
+                    },
+                    error: generateSwal("error", "Error", "No lobby with provided code exists")
+                });
             }
             else
             {
-                window.location.replace(redirect);
+                window.location.replace(loginURL);
             }
         }
 

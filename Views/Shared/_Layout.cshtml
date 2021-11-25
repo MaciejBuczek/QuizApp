@@ -1,4 +1,6 @@
-﻿<!DOCTYPE html>
+﻿@using QuizApp.Constants;
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -28,14 +30,17 @@
                             <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                        <li class="nav-item">
                             <a class="nav-link" asp-area="" asp-controller="Quiz" asp-action="Create">Create Quiz</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" asp-area="" asp-controller="Quiz" asp-action="MyQuizzes">My Quizzes</a>
                         </li>
+                        @if (User.Identity.IsAuthenticated && User.IsInRole(Roles.AdminRole))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="" asp-controller="User" asp-action="Search">Menage Users</a>
+                            </li>
+                        }
                     </ul>
                 </div>
             </div>
