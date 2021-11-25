@@ -34,9 +34,9 @@
                         </div>
                         <div class="col-2">
                             <div class="ml-4">
-                                <div class="btn btn-warning float-left ml-4">
+                                <a class="btn btn-warning float-left ml-4" asp-controller="User" asp-action="Edit" asp-route-id="@user.Id">
                                     <i class="fas fa-user-edit"></i>
-                                </div>
+                                </a>
                                 <a class="btn btn-danger float-left ml-2" asp-controller="User" asp-action="Remove" asp-route-id="@user.Id">
                                     <i class="fas fa-trash-alt"></i>
                                 </a>
