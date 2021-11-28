@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using QuizApp.Constants;
 using QuizApp.Data;
+using QuizApp.Models.APIRequests;
 using QuizApp.Models.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -10,7 +12,6 @@ using System.Threading.Tasks;
 
 namespace QuizApp.Controllers
 {
-    [Authorize(Roles = Constants.Roles.AdminRole)]
     public class UserController : Controller
     {
         private readonly ApplicationDbContext _db;
@@ -23,13 +24,35 @@ namespace QuizApp.Controllers
             _userManager = userManager;
         }
 
+        [HttpPost]
+        public async Task<IActionResult> Register(RegisterRequest request)
+        {
+            if (request == null)
+                return BadRequest();
+
+            var user = new IdentityUser
+            {
+                UserName = request.Username,
+                Email = request.Email
+            };
+
+            await _userManager.AddToRoleAsync(user, Roles.UserRole);
+            var result = await _userManager.CreateAsync(user, request.Password);
+            
+            if(result.Succeeded)
+                return Ok();
+            return BadRequest();
+        }
+
         [HttpGet]
+        [Authorize(Roles = Constants.Roles.AdminRole)]
         public IActionResult Index()
         {
             return View();
         }
 
         [HttpGet]
+        [Authorize(Roles = Constants.Roles.AdminRole)]
         public IActionResult Search(string username, string email, int? targetPage)
         {
             var userQuery = _db.Users
@@ -48,6 +71,7 @@ namespace QuizApp.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = Constants.Roles.AdminRole)]
         public async Task<IActionResult> Remove(string id)
         {
             if (string.IsNullOrEmpty(id))
@@ -62,6 +86,7 @@ namespace QuizApp.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = Constants.Roles.AdminRole)]
         public async Task<IActionResult> Edit(string id)
         {
             if (string.IsNullOrEmpty(id))
@@ -75,6 +100,7 @@ namespace QuizApp.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = Constants.Roles.AdminRole)]
         public async Task<IActionResult> EditUsername(string id, string username)
         {
             if (string.IsNullOrEmpty(id) || string.IsNullOrEmpty(username))
@@ -93,6 +119,7 @@ namespace QuizApp.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = Constants.Roles.AdminRole)]
         public async Task<IActionResult> EditEmail(string id, string email)
         {
             if (string.IsNullOrEmpty(id) || string.IsNullOrEmpty(email))
@@ -110,6 +137,7 @@ namespace QuizApp.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = Constants.Roles.AdminRole)]
         public async Task<IActionResult> EditPassword(string id, string password)
         {
             if (string.IsNullOrEmpty(id) || string.IsNullOrEmpty(password))
