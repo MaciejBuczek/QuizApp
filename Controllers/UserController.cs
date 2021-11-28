@@ -25,7 +25,7 @@ namespace QuizApp.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Register(RegisterRequest request)
+        public async Task<IActionResult> Register([FromBody] RegisterRequest request)
         {
             if (request == null)
                 return BadRequest();
@@ -36,11 +36,13 @@ namespace QuizApp.Controllers
                 Email = request.Email
             };
 
-            await _userManager.AddToRoleAsync(user, Roles.UserRole);
             var result = await _userManager.CreateAsync(user, request.Password);
-            
-            if(result.Succeeded)
+            if (result.Succeeded)
+            {
+                await _userManager.AddToRoleAsync(user, Roles.UserRole);
                 return Ok();
+            }
+                
             return BadRequest();
         }
 
