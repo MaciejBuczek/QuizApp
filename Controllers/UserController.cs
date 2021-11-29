@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using QuizApp.Constants;
 using QuizApp.Data;
+using QuizApp.Models.API;
 using QuizApp.Models.APIRequests;
 using QuizApp.Models.ViewModels;
 using System;
@@ -16,12 +17,14 @@ namespace QuizApp.Controllers
     {
         private readonly ApplicationDbContext _db;
         private readonly UserManager<IdentityUser> _userManager;
+        private readonly SignInManager<IdentityUser> _signInManager;
         private readonly int _resultPerPage = 10;
 
-        public UserController(ApplicationDbContext db, UserManager<IdentityUser> userManager)
+        public UserController(ApplicationDbContext db, UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager)
         {
             _db = db;
             _userManager = userManager;
+            _signInManager = signInManager;
         }
 
         [HttpPost]
@@ -44,6 +47,23 @@ namespace QuizApp.Controllers
             }
                 
             return BadRequest();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Login([FromBody] LoginRequest request)
+        {
+            if (request == null)
+                return BadRequest();
+
+            var user = await _userManager.FindByNameAsync(request.Username);
+            if (user == null)
+                return BadRequest();
+
+            var result = await _signInManager.CheckPasswordSignInAsync(user, request.Password, false);
+            if (result.Succeeded)
+                return Ok();
+            return BadRequest();
+
         }
 
         [HttpGet]
