@@ -63,7 +63,6 @@ namespace QuizApp.Controllers
             if (result.Succeeded)
                 return Ok();
             return BadRequest();
-
         }
 
         [HttpGet]
