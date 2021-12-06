@@ -61,7 +61,7 @@ namespace QuizApp.Controllers
 
             var result = await _signInManager.CheckPasswordSignInAsync(user, request.Password, false);
             if (result.Succeeded)
-                return Ok();
+                return Ok(user.Id.ToString());
             return BadRequest();
         }
 
