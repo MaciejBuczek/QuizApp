@@ -59,7 +59,7 @@ namespace QuizApp.Hubs
             await ConnectToQuiz(lobbyCode);
         }
 
-        public Task ConnectToQuiz(string lobbyCode)
+        public async Task ConnectToQuiz(string lobbyCode)
         {
             Context.Items.Add(QuizContextItems.LobbyCode, lobbyCode);
 
@@ -76,16 +76,14 @@ namespace QuizApp.Hubs
                 UsersScores = quizRunner.UserScores
             };
             quizInfo.UsersScores.OrderByDescending(us => us.Username);
-            Groups.AddToGroupAsync(Context.ConnectionId, lobbyCode);
-            Clients.Caller.SendAsync("initalizeQuiz", quizInfo);
-            Clients.GroupExcept(lobbyCode, Context.ConnectionId).SendAsync("updateScoreboard", quizInfo.UsersScores);
+            await Groups.AddToGroupAsync(Context.ConnectionId, lobbyCode);
+            await Clients.Caller.SendAsync("initalizeQuiz", quizInfo);
+            await Clients.GroupExcept(lobbyCode, Context.ConnectionId).SendAsync("updateScoreboard", quizInfo.UsersScores);
 
             if(quizLobby.UsersConnectedAtStart == quizRunner.UserScores.Count)
             {
-               return BeginQuiz(lobbyCode);
+                await BeginQuiz(lobbyCode);
             }
-
-            return Task.CompletedTask;
         }
 
         public async Task GetQuestion()
