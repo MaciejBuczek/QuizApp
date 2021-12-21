@@ -157,7 +157,7 @@ namespace QuizApp.Controllers
             if (quizRunner == null)
                 return NotFound();
 
-            return Ok(quizRunner.UserScores);
+            return Ok(quizRunner.UserScores.OrderByDescending(us => us.Score).ThenBy(us => us.Username).ToList());
         }
         
         [HttpGet]
