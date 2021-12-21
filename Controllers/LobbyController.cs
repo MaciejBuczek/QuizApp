@@ -146,6 +146,19 @@ namespace QuizApp.Controllers
 
             return View(vm);
         }
+
+        [HttpGet]
+        public IActionResult SummaryAPI(string lobbyCode)
+        {
+            if (string.IsNullOrEmpty(lobbyCode))
+                return NotFound();
+
+            var quizRunner = _quizManager.GetQuizRunner(lobbyCode);
+            if (quizRunner == null)
+                return NotFound();
+
+            return Ok(quizRunner.UserScores);
+        }
         
         [HttpGet]
         [Authorize]
