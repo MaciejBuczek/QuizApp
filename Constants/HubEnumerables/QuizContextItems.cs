@@ -2,6 +2,6 @@
 {
     public enum QuizContextItems
     {
-        LobbyCode, Removable
+        LobbyCode, Removable, Username
     }
 }

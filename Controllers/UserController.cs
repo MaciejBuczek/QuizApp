@@ -1,7 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using QuizApp.Constants;
 using QuizApp.Data;
+using QuizApp.Models.API;
+using QuizApp.Models.APIRequests;
 using QuizApp.Models.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -10,26 +13,67 @@ using System.Threading.Tasks;
 
 namespace QuizApp.Controllers
 {
-    [Authorize(Roles = Constants.Roles.AdminRole)]
     public class UserController : Controller
     {
         private readonly ApplicationDbContext _db;
         private readonly UserManager<IdentityUser> _userManager;
+        private readonly SignInManager<IdentityUser> _signInManager;
         private readonly int _resultPerPage = 10;
 
-        public UserController(ApplicationDbContext db, UserManager<IdentityUser> userManager)
+        public UserController(ApplicationDbContext db, UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager)
         {
             _db = db;
             _userManager = userManager;
+            _signInManager = signInManager;
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Register([FromBody] RegisterRequest request)
+        {
+            if (request == null)
+                return BadRequest();
+
+            var user = new IdentityUser
+            {
+                UserName = request.Username,
+                Email = request.Email
+            };
+
+            var result = await _userManager.CreateAsync(user, request.Password);
+            if (result.Succeeded)
+            {
+                await _userManager.AddToRoleAsync(user, Roles.UserRole);
+                return Ok();
+            }
+                
+            return BadRequest();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Login([FromBody] LoginRequest request)
+        {
+            if (request == null)
+                return BadRequest();
+
+            var user = await _userManager.FindByNameAsync(request.Username);
+            if (user == null)
+                return BadRequest();
+
+            var result = await _signInManager.CheckPasswordSignInAsync(user, request.Password, false);
+            if (result.Succeeded)
+                return Ok(user.Id.ToString());
+            return BadRequest();
         }
 
         [HttpGet]
+        [Authorize(Roles = Constants.Roles.AdminRole)]
         public IActionResult Index()
         {
             return View();
         }
 
         [HttpGet]
+        [Authorize(Roles = Constants.Roles.AdminRole)]
         public IActionResult Search(string username, string email, int? targetPage)
         {
             var userQuery = _db.Users
@@ -48,6 +92,7 @@ namespace QuizApp.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = Constants.Roles.AdminRole)]
         public async Task<IActionResult> Remove(string id)
         {
             if (string.IsNullOrEmpty(id))
@@ -62,6 +107,7 @@ namespace QuizApp.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = Constants.Roles.AdminRole)]
         public async Task<IActionResult> Edit(string id)
         {
             if (string.IsNullOrEmpty(id))
@@ -75,6 +121,7 @@ namespace QuizApp.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = Constants.Roles.AdminRole)]
         public async Task<IActionResult> EditUsername(string id, string username)
         {
             if (string.IsNullOrEmpty(id) || string.IsNullOrEmpty(username))
@@ -93,6 +140,7 @@ namespace QuizApp.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = Constants.Roles.AdminRole)]
         public async Task<IActionResult> EditEmail(string id, string email)
         {
             if (string.IsNullOrEmpty(id) || string.IsNullOrEmpty(email))
@@ -110,6 +158,7 @@ namespace QuizApp.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = Constants.Roles.AdminRole)]
         public async Task<IActionResult> EditPassword(string id, string password)
         {
             if (string.IsNullOrEmpty(id) || string.IsNullOrEmpty(password))

@@ -6,15 +6,16 @@ using QuizApp.Data;
 using QuizApp.Data.Implementations;
 using QuizApp.Data.Interfaces;
 using QuizApp.Models;
+using QuizApp.Models.API;
 using QuizApp.Models.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace QuizApp.Controllers
 {
-    [Authorize]
     public class LobbyController : Controller
     {
         private readonly IQuizManager _quizManager;
@@ -29,6 +30,7 @@ namespace QuizApp.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public IActionResult Index()
         {
             return View();
@@ -45,6 +47,7 @@ namespace QuizApp.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public IActionResult RegenerateCode(string previousCode)
         {
             if (string.IsNullOrEmpty(previousCode) || _quizManager.GetLobby(previousCode) == null)
@@ -56,6 +59,7 @@ namespace QuizApp.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public IActionResult Join(string lobbyCode)
         {
             if (string.IsNullOrEmpty(lobbyCode))
@@ -72,8 +76,30 @@ namespace QuizApp.Controllers
             return View(nameof(Index), lobbyVM);
         }
 
-        [Authorize]
         [HttpGet]
+        public IActionResult JoinAPI(string lobbyCode)
+        {
+            if (string.IsNullOrEmpty(lobbyCode))
+                return NotFound();
+
+            var quiz = _quizManager.GetQuizRunner(lobbyCode).Quiz;
+            var response = new JoinResponse
+            {
+                Title = GetStringWithoutHTMLTags(quiz.Title),
+                Description = GetStringWithoutHTMLTags(quiz.Description ?? string.Empty),
+                Rating = quiz.Ratings.Count == 0 ? 0 : quiz.Ratings.Average(r => r.Content),
+                TotalQuestions = quiz.Questions.Count,
+                TotalTime = quiz.Questions.Sum(q => q.Time),
+                TotalPoints = quiz.Questions.Sum(q => q.Points),
+                CreatedOn = quiz.CreatedAt,
+                CreatedBy = quiz.CreatedBy.UserName
+            };
+
+            return Ok(response);
+        }
+
+        [HttpGet]
+        [Authorize]
         public IActionResult Create(int quizId)
         {
             if (_db.Quizzes.Find(quizId) == null)
@@ -85,6 +111,7 @@ namespace QuizApp.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public IActionResult Quiz(string lobbyCode)
         {
             if (string.IsNullOrEmpty(lobbyCode))
@@ -94,6 +121,7 @@ namespace QuizApp.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public IActionResult Summary(string lobbyCode)
         {
             if (string.IsNullOrEmpty(lobbyCode))
@@ -118,8 +146,22 @@ namespace QuizApp.Controllers
 
             return View(vm);
         }
+
+        [HttpGet]
+        public IActionResult SummaryAPI(string lobbyCode)
+        {
+            if (string.IsNullOrEmpty(lobbyCode))
+                return NotFound();
+
+            var quizRunner = _quizManager.GetQuizRunner(lobbyCode);
+            if (quizRunner == null)
+                return NotFound();
+
+            return Ok(quizRunner.UserScores.OrderByDescending(us => us.Score).ThenBy(us => us.Username).ToList());
+        }
         
         [HttpGet]
+        [Authorize]
         public IActionResult Start(int quizId)
         {
             if (_db.Quizzes.Find(quizId) == null)
@@ -162,6 +204,11 @@ namespace QuizApp.Controllers
             };
 
             return lobbyVM;
+        }
+
+        private string GetStringWithoutHTMLTags(string input)
+        {
+            return Regex.Replace(input, "<.*?>", string.Empty);
         }
     }
 }

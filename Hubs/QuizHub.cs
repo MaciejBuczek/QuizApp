@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.SignalR;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.SignalR;
 using QuizApp.Constants.HubEnumerables;
 using QuizApp.Data.Implementations;
 using QuizApp.Data.Interfaces;
@@ -14,11 +15,12 @@ namespace QuizApp.Hubs
     public class QuizHub : Hub
     {
         private readonly IQuizManager _quizManager;
+        private readonly UserManager<IdentityUser> _userManager;
 
-
-        public QuizHub(IQuizManager quizManager)
+        public QuizHub(IQuizManager quizManager, UserManager<IdentityUser> userManager)
         {
             _quizManager = quizManager;
+            _userManager = userManager;
         }
 
         public override Task OnDisconnectedAsync(Exception exception)
@@ -28,7 +30,11 @@ namespace QuizApp.Hubs
                 var quizRunner = _quizManager.GetQuizRunner((string)lobbyCode);
                 if (!quizRunner.IsFinished)
                 {
-                    quizRunner.UserScores.Remove(quizRunner.UserScores.Where(us => us.Username == Context.User.Identity.Name).FirstOrDefault());
+                    var username = GetUsername();
+                    if (username == null)
+                        throw new ApplicationException("cannot read user username");
+
+                    quizRunner.UserScores.Remove(quizRunner.UserScores.Where(us => us.Username == username).FirstOrDefault());
                     quizRunner.UserScores = quizRunner.UserScores.OrderByDescending(us => us.Score).ThenBy(us => us.Username).ToList();
 
                     Clients.Group((string)lobbyCode).SendAsync("updateScoreboard", quizRunner.UserScores);
@@ -43,37 +49,53 @@ namespace QuizApp.Hubs
             return base.OnDisconnectedAsync(exception);
         }
 
-        public Task ConnectToQuiz(string lobbyCode)
+        public async Task ConnectToQuizMobile(string lobbyCode, string userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+                return;
+
+            Context.Items.Add(QuizContextItems.Username, user.UserName);
+            await ConnectToQuiz(lobbyCode);
+        }
+
+        public async Task ConnectToQuiz(string lobbyCode)
         {
             Context.Items.Add(QuizContextItems.LobbyCode, lobbyCode);
 
+            var username = GetUsername();
+            if (username == null)
+                throw new ApplicationException("cannot read user username");
+
             var quizRunner = _quizManager.GetQuizRunner(lobbyCode);
             var quizLobby = _quizManager.GetLobby(lobbyCode);
-            quizRunner.UserScores.Add( new UserScore { Username = Context.User.Identity.Name, Score = 0 });
+            quizRunner.UserScores.Add( new UserScore { Username = username, Score = 0 });
             var quizInfo = new
             {
                 QuizTitle = _quizManager.GetQuizRunner(lobbyCode).Quiz.Title,
                 UsersScores = quizRunner.UserScores
             };
             quizInfo.UsersScores.OrderByDescending(us => us.Username);
-            Groups.AddToGroupAsync(Context.ConnectionId, lobbyCode);
-            Clients.Caller.SendAsync("initalizeQuiz", quizInfo);
-            Clients.GroupExcept(lobbyCode, Context.ConnectionId).SendAsync("updateScoreboard", quizInfo.UsersScores);
+            await Groups.AddToGroupAsync(Context.ConnectionId, lobbyCode);
+            await Clients.Caller.SendAsync("initalizeQuiz", quizInfo);
+            await Clients.GroupExcept(lobbyCode, Context.ConnectionId).SendAsync("updateScoreboard", quizInfo.UsersScores);
 
             if(quizLobby.UsersConnectedAtStart == quizRunner.UserScores.Count)
             {
-               return BeginQuiz(lobbyCode);
+                await BeginQuiz(lobbyCode);
             }
-
-            return Task.CompletedTask;
         }
 
         public async Task GetQuestion()
         {
             if (Context.Items.TryGetValue(QuizContextItems.LobbyCode, out var lobbyCode))
             {
+                var username = GetUsername();
+                if (username == null)
+                    await Clients.Group((string)lobbyCode).SendAsync("displayError", "Connection Lost");
+
                 var quizRuuner = _quizManager.GetQuizRunner((string)lobbyCode);
-                await Clients.Caller.SendAsync("loadQuestion", quizRuuner.GetQuestion(Context.User.Identity.Name));
+                await Clients.Caller.SendAsync("loadQuestion", quizRuuner.GetQuestion(username));
             }
             else
                 await Clients.Group((string)lobbyCode).SendAsync("displayError", "Connection Lost");
@@ -83,9 +105,12 @@ namespace QuizApp.Hubs
         {
             if (Context.Items.TryGetValue(QuizContextItems.LobbyCode, out var lobbyCode))
             {
-                var quizRunner = _quizManager.GetQuizRunner((string)lobbyCode);
-                
-                quizRunner.CalculatePoints(Context.User.Identity.Name, answers);
+                var username = GetUsername();
+                if (username == null)
+                    await Clients.Group((string)lobbyCode).SendAsync("displayError", "Connection Lost");
+
+                var quizRunner = _quizManager.GetQuizRunner((string)lobbyCode);                
+                quizRunner.CalculatePoints(username, answers);
 
                 if (quizRunner.UserScores.All(us => us.IsModiefied))
                 {
@@ -119,7 +144,21 @@ namespace QuizApp.Hubs
             {
                 await Clients.Group((string)lobbyCode).SendAsync("displayError", "Connection Lost");
             }
-        } 
+        }
 
+        private string GetUsername()
+        {
+            var username = Context.User.Identity.Name;
+            if (username == null)
+            {
+                if (Context.Items.TryGetValue(QuizContextItems.Username, out var value))
+                {
+                    username = (string)value;
+                }
+                else
+                    return null;
+            }
+            return username;
+        }
     }
 }
