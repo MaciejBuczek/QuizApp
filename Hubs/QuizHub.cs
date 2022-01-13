@@ -114,7 +114,7 @@ namespace QuizApp.Hubs
 
                 if (quizRunner.UserScores.All(us => us.IsModiefied))
                 {
-                    await Clients.Group((string)lobbyCode).SendAsync("updateScoreboard", quizRunner.UserScores);
+                    await Clients.Group((string)lobbyCode).SendAsync("updateScoreboard", quizRunner.UserScores.OrderByDescending(us => us.Score).ThenBy(us => us.Username));
 
                     quizRunner.UserScores.ForEach(us => us.IsModiefied = false);
 
